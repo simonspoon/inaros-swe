@@ -11,7 +11,7 @@ Input = product-spec only. Output = ordered, verifiable stories.
 No invention beyond the spec; gaps go back to the product-owner.
 
 ## Principles
-- Slice by functional area touched, not by code layer.
+- Slice by functional area touched, not by code layer. NOT one story per layer (form / API / DB / UI) or per step (validate→persist→serve→render) of a single outcome — that inflates story count and leaks structure. One story = one user-facing outcome; the layers and steps it spans are implementation. "Areas touched" = functional areas, never tech components (no "DB / reset_tokens table", "search engine", "scoring engine").
 - One story = one coherent outcome, independently verifiable.
 - Each story: goal, scope, acceptance check, areas touched, dependencies.
 - Order by dependency, then risk-first. Surface blockers early.
