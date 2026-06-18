@@ -30,7 +30,9 @@ One briefing text every expert receives. Self-contained — subagents can't see 
   === END ARTIFACT ===
   ```
 
-Before spawning → tell user in one short status what briefing contains (idea, key context, files included). Don't block on confirmation. Assembling required guessing something important → ask, don't guess.
+  Referenced file missing on disk = a gap, not a blocker. Note it ("file X not found — reviewed from description only"), brief the idea + settled decisions you do have, proceed. Don't stop, don't fabricate contents.
+
+Before spawning → tell user in one short status what briefing contains (idea, key context, files included). Don't block on confirmation. Idea or a settled decision present → brief it; never withhold the panel for absent files. Ask only if a load-bearing fact you can't infer is genuinely unstated — missing file contents alone are not that fact.
 
 ## Step 3: Spawn all 5 experts in parallel
 

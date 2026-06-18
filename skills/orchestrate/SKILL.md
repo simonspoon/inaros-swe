@@ -85,12 +85,15 @@ Append-only. One line per unit. Source of truth for status; survives compaction 
 
 ## Big-task flow
 
+Run carries through all 5 steps in one go. The PO "User confirms" is a **checkpoint, not a terminus** — do not stop there. If you must pause for confirmation, still lay out the dispatch plan in the same response: epic-orch fan-out per epic, depth levels (main 0 / epic-orch 1 / engineer 2 / fan-out 3), the ledger lines you'll write, and the concurrency cap. A spec with no dispatch plan is half-done.
+
 1. **PO** → `product-spec.md`. User confirms. (flat)
 2. **Planner**, large spec → decompose to epics first (`epics/*/`), then **fan out per-epic planners** (depth 1) — each emits only its epic's `stories.md`. Avoids one planner overflowing on 100 stories. Small spec → single planner, flat story list.
 3. **Architect** → contracts/ADRs. Cross-cutting → `.scratch/arch.md`; epic-local → `epics/NN/arch.md`. (flat; may fan out for codebase mapping)
 4. **Dispatch:**
-   - Small → main fans engineers across independent stories (one message, multiple calls), drains pass/fail to `ledger.md`.
-   - Large → main fans **one epic-orch per epic** (depth 1); each epic-orch fans engineers (depth 2) over its stories, drains to its `epics/NN/ledger.md`, returns one epic status line to main's `ledger.md`.
+   - Each engineer writes its full result to `result.md` and returns **one status line** (`<id> <status> [note]`, status ∈ pass | blocked | conflict) — never the payload.
+   - Small → main fans engineers across independent stories (one message, multiple calls), drains each returned status line as `<id> <status> <pointer>` (pointer = the story's `result.md`) into `ledger.md`.
+   - Large → main fans **one epic-orch per epic** (depth 1); each epic-orch fans engineers (depth 2) over its stories, drains their `<id> <status> <pointer>` lines into its `epics/NN/ledger.md`, returns one epic status line to main's `ledger.md`.
 5. Order by dependency (planner-stated); independent units run concurrent.
 
 ## Parallel writes

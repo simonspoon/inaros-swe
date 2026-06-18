@@ -26,7 +26,13 @@ nyx show "$CLAUDE_CODE_SESSION_ID"  # the current session's transcript
 - `nyx` lags the live session — won't include most recent turns (still only in context), may omit current turn. Transcript covers the *earlier* part, live context covers the *tail*; use both, neither alone.
 - Long transcript can be large. Read it to recover what compaction dropped — don't re-ingest turns already in context.
 
-Context NOT compacted → skip `nyx`, analyze live context directly. Either way, state coverage in report (full / backfilled-via-nyx / partial). Never present a partial review as complete.
+Context NOT compacted → skip `nyx`, analyze live context directly. Pick the coverage label by condition:
+
+- not compacted → **full**
+- compacted, recovery succeeded → **backfilled via nyx**
+- compacted, recovery attempt failed → **partial** (name what's missing)
+
+Always emit a report with one Coverage line — even when recovery is blocked, report `partial` with what's missing. Never abstain, never present a partial review as complete.
 
 ## 2. Find candidate findings
 

@@ -24,7 +24,7 @@ khora screenshot $S -o /tmp/khora-$S-final.png   # then Read the PNG
 khora kill $S
 ```
 
-Before reporting results — pass or fail — run `khora kill $S`. Lost track of `$S` → `khora status` (no arg lists all sessions), kill the one you launched. Never launch a second session because the first "got confused" — kill it, then relaunch.
+Before reporting results — pass, fail, blocked, or stopped early (a session may already be launched) — run `khora kill $S`. Lost track of `$S` → `khora status` (no arg lists all sessions), kill the one you launched. Never launch a second session because the first "got confused" — kill it, then relaunch.
 
 ## Verifying a change
 
@@ -32,11 +32,12 @@ Before checks, confirm you're looking at the build you think you're testing: ass
 
 Report each check PASS or FAIL with evidence, not "looks fine":
 - text/eval asserts: quote actual value next to expected.
-- console: PASS only if zero error-level messages; paste any errors verbatim.
+- console: must end in a verdict — PASS only if zero error-level messages (state that), else FAIL with errors pasted verbatim. "Checked console" without one of those two is not a result.
 - screenshot: take ONE at end-state, Read it, report its path. Evidence for the human, not the verdict — cheap text asserts (`text`, `eval`, `wait-for`) carry the verification. Don't screenshot intermediate states unless a text assert can't answer the question.
 
 ## Failure handling
 
+- Navigation returns `ERR_CONNECTION_REFUSED` / page is Chrome's "This site can't be reached" interstitial = app unreachable, a precondition mismatch — not a slow page, not a wait-for exit 3 to retry. Input said the app is running but the URL didn't answer → report the verification BLOCKED, quoting the mismatch as evidence (e.g. "input: running at :3000; navigate returned ERR_CONNECTION_REFUSED"). Do NOT abstain silently, do NOT fabricate the opposite, do NOT start the server. Still `khora kill $S`.
 - `wait-for` / `wait-gone` exit 3 = element never reached that state within timeout — page in unexpected state, not necessarily slow. Screenshot + `khora console $S` to see why. Retry once with longer `--timeout` only if you can say why first timeout was too short (e.g. cold dev-server compile); else report FAIL with selector + timeout used.
 - Commands failing with dead/unknown session: `khora status` to check, then relaunch.
 
