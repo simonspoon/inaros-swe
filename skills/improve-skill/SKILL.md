@@ -62,7 +62,7 @@ Write `.scratch/improve-<target>/cases.md`. Cases = the fixed regression set for
 
 ## Step 4: Run target on cases × models (parallel)
 
-Per (case, model) pair in `cases × MODELS`, spawn one runner — `agentType: inaros-plugin:improve-runner` — with Agent `model` set to that model. Single-model run → one runner per case, no override. All calls in ONE message → concurrent. Runners independent — none sees another. Per prompt:
+Per (case, model) pair in `cases × MODELS`, spawn one runner — `agentType: inaros-swe:improve-runner` — with Agent `model` set to that model. Single-model run → one runner per case, no override. All calls in ONE message → concurrent. Runners independent — none sees another. Per prompt:
 
 ```
 Run the target under test on one scenario and report what it produced.
@@ -88,7 +88,7 @@ Capture each output verbatim to `.scratch/improve-<target>/run-<iter>/<model>/ca
 
 ## Step 5: Judge (parallel)
 
-Per (case, model) output, spawn one judge — `agentType: inaros-plugin:improve-judge` — with Agent `model` PINNED to `opus` — never the model under test. Independent from its runner — runner never judges itself. Give judge: rubric, the case, expected behavior, runner output (and which model produced it). Judge scores each relevant check pass/fail, one-line reason, severity (blocker/major/minor). Judge must quote the runner output it scores.
+Per (case, model) output, spawn one judge — `agentType: inaros-swe:improve-judge` — with Agent `model` PINNED to `opus` — never the model under test. Independent from its runner — runner never judges itself. Give judge: rubric, the case, expected behavior, runner output (and which model produced it). Judge scores each relevant check pass/fail, one-line reason, severity (blocker/major/minor). Judge must quote the runner output it scores.
 
 All judge calls in one message. Aggregate per model → score line per model, e.g. `opus pass 11/12 · sonnet pass 9/12 · haiku pass 6/12`, failures grouped by check + severity, tagged with the model(s) that failed them. Write to `run-<iter>/scores.md`.
 

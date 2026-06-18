@@ -36,7 +36,7 @@ Before spawning → tell user in one short status what briefing contains (idea, 
 
 ## Step 3: Spawn all 5 experts in parallel
 
-Per expert: read `personas/<name>.md` from this skill's dir, insert verbatim as `{PERSONA}` — don't paraphrase or compress. Send all 5 Agent calls in ONE message → concurrent, `subagent_type: "inaros-plugin:expert-mimic"` (toolless critic agent; mechanically can't read files, fetch, or run commands — so the "no tools" rule below is enforced, not just asked).
+Per expert: read `personas/<name>.md` from this skill's dir, insert verbatim as `{PERSONA}` — don't paraphrase or compress. Send all 5 Agent calls in ONE message → concurrent, `subagent_type: "inaros-swe:expert-mimic"` (toolless critic agent; mechanically can't read files, fetch, or run commands — so the "no tools" rule below is enforced, not just asked).
 Use EXACTLY this template per prompt.
 Fill all three slots (EXPERT, PERSONA, BRIEFING):
 

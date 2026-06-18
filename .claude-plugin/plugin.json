@@ -1,5 +1,5 @@
 {
-  "name": "inaros-plugin",
+  "name": "inaros-swe",
   "version": "0.1.0",
   "description": "Personal inaros skills and agents: orchestration pipeline (product-owner/planner/architect/engineer), KB capture/lookup, AI-expert consults, browser QA, and session retrospectives.",
   "author": {
