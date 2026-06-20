@@ -22,13 +22,13 @@ Specs + status live in **mesa**, not files. `.scratch/` holds only arch docs + e
 ## Two axes — don't conflate
 
 - **Role pipeline: flat.** PO → planner → architect → engineer never nest *each other*. Main loop orchestrates; each role returns; main reads the artifact and dispatches the next. Nesting roles wastes depth for zero parallelism.
-- **Work dispatch: hierarchical.** Many stories → orchestrators of orchestrators. Depth spent here, on fan-out capacity. Scale by widening the tree, not lengthening any context.
+- **Work dispatch: hierarchical.** Many stories → orchestrators of orchestrators. Depth spent here, on fan-out capacity. Scale by widening the tree, not lengthening any context. Epic-orch layer = the `orchestrator` agent (`${CLAUDE_PLUGIN_ROOT}/agents/orchestrator.md`) — dispatch it by that name, never a generic `claude`/`general-purpose` agent (no orchestrate context, won't honor pointers/depth/mesa).
 
 ## Depth budget (floor = 5)
 
 ```
 main(0)            role pipeline + epic index + epic status
-  epic-orch(1)     one epic's stories + story status
+  epic-orch(1)     one epic's stories + story status   [= orchestrator agent]
     engineer(2)    one story
       fan-out(3)   bug-hunt / Explore / search
 ```
@@ -98,7 +98,7 @@ Run carries through all 5 steps in one go. The PO "User confirms" is a **checkpo
 4. **Dispatch** — driven by `mesa task next --project <P>` (leaf stories only):
    - Each engineer flips its story `in_progress` → `done` + `--artifact`, writes full result to `result.md`, returns **one status line** (`<id> <status> [note]`, status ∈ pass | blocked | conflict) — never the payload.
    - Small → main fans engineers across the unblocked batch (`task list --status todo --unblocked`, one message/multiple calls); status lands in mesa.
-   - Large → main fans **one epic-orch per epic** (depth 1); each epic-orch drives `task next` over its epic's stories, fans engineers (depth 2), returns one epic status line to main. Closes the epic umbrella task (`--status done`) once its stories all `done`.
+   - Large → main fans **one `orchestrator` agent per epic** (depth 1, the epic-orch role); each drives `task next` over its epic's stories, fans engineers (depth 2), returns one epic status line to main. Closes the epic umbrella task (`--status done`) once its stories all `done`.
 5. Order by dependency (block edges); independent units (unblocked) run concurrent.
 
 ## Parallel writes
