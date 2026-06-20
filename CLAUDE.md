@@ -87,7 +87,7 @@ Multi-step task → write plan with a check per step, then execute:
 
 ## Orchestration
 
-Multi-step task spanning the product-owner → planner → architect → engineer pipeline → invoke the `orchestrate` skill and drive per it. Flat roles (handoff via main, 0 depth), hierarchical work dispatch (depth for fan-out), pointer-return not payloads, ledger + `.scratch/` as on-disk source of truth. Small task (≤ ~8 stories) → flatten, skip the epic layer.
+Multi-step task spanning the product-owner → planner → architect → engineer pipeline → invoke the `orchestrate` skill and drive per it. Flat roles (handoff via main, 0 depth), hierarchical work dispatch (depth for fan-out), pointer-return not payloads, mesa (specs + status) as backbone with `.scratch/` for arch docs + results. Small task (≤ ~8 stories) → flatten, skip the epic layer.
 
 ## Authoring Skills & Agents
 

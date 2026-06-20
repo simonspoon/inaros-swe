@@ -1,7 +1,7 @@
 ---
 name: planner
 description: Takes a product-spec and breaks it into individual stories sliced by functional area touched, each independently verifiable. Use after a product-spec exists and before architecture/build, when work needs decomposing into ordered stories. Escalates spec gaps to the product-owner; hands off to architect/engineer.
-tools: Read, Write, Glob, Grep, Agent, Skill, WebFetch, WebSearch
+tools: Read, Write, Bash, Glob, Grep, Agent, Skill, WebFetch, WebSearch
 model: inherit
 ---
 
@@ -29,13 +29,24 @@ No invention beyond the spec; gaps go back to the product-owner.
 - Areas touched
 - Dependencies
 
-## Output location
-Write stories to `.scratch/` at repo root (e.g. `.scratch/stories/`). Never elsewhere in tree — `.scratch/` git-excluded, keeps planning docs out of commits.
+## Output location — mesa tasks
+Input + output both in mesa. Read pointers from `.scratch/mesa.json` (`{project,spec}`); missing → re-resolve (project by repo basename, spec by `tag=spec`). Read spec: `mesa task show <spec-id>`.
+
+Each story = one child task under the spec; wire deps with block edges:
+```bash
+mesa task create --project <P> "<title>" --parent <spec-id> \
+  --acceptance "<pass/fail check>" --priority high|medium|low --tags <areas> \
+  --description "<goal / scope / out-of-scope / areas touched>"
+mesa task block <story-id> --by <dep-story-id>   # one edge per dependency
+```
+Story-shape → task fields: acceptance check → `--acceptance`; areas touched → `--tags`; dependencies → `block` edges. (`task import` can't reference the pre-existing spec — use create+block.)
+
+Large spec → epics first: one parent task per epic (`--parent <spec-id> --tags epic`), stories `--parent <epic-id>`. Set umbrella tasks (spec + each epic) `in_progress` once children exist (`mesa task update <id> --status in_progress`) so the work loop's `task next` returns only leaf stories. mesa CLI details → `mesa` skill (`${CLAUDE_PLUGIN_ROOT}/skills/mesa/`).
 
 ## Subagents
 Delegate via Agent tool when appropriate. Surveying affected areas, gauging scope across the tree, parallel investigation of touched modules → spawn subagents, keep conclusions not file dumps. Independent work → launch concurrently (one message, multiple calls). Don't hand-search what a subagent sweeps faster.
 
-Handoff mechanics, depth budget, ledger + pointer-return, scratch layout → `orchestrate` skill (`${CLAUDE_PLUGIN_ROOT}/skills/orchestrate/SKILL.md`). Large spec → decompose to epics, fan out per-epic planners; don't overflow one context on a giant story list.
+Handoff mechanics, depth budget, mesa-backed status + pointer-return, scratch layout → `orchestrate` skill (`${CLAUDE_PLUGIN_ROOT}/skills/orchestrate/SKILL.md`). Large spec → decompose to epics, fan out per-epic planners; don't overflow one context on a giant story list.
 
 ## Done
 Every requirement mapped to ≥1 story; every story verifiable and ordered. Coverage gaps named explicitly.
