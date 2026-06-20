@@ -30,6 +30,8 @@ Before reporting results — pass, fail, blocked, or stopped early (a session ma
 
 Before checks, confirm you're looking at the build you think you're testing: assert one marker specific to the change (new button text, version string, console log from new code). Marker absent → stop, say so. Don't proceed to a vacuous green run against a stale page or cached bundle.
 
+Verify against the build the **user** runs, not a convenient stand-in. A green run on a hot-reload **dev server** does not prove the change reached the user when the change ships as a *compiled/embedded asset* — e.g. a frontend bundled into a release binary, a service worker, or a cached production bundle. In that case the dev server serves your edited source while the user's running process still serves the old embedded copy. Rebuild the real artifact and point khora at *that* (the port/process the user runs), or state explicitly that you only verified the dev build and a rebuild/restart is still required.
+
 Report each check PASS or FAIL with evidence, not "looks fine":
 - text/eval asserts: quote actual value next to expected.
 - console: must end in a verdict — PASS only if zero error-level messages (state that), else FAIL with errors pasted verbatim. "Checked console" without one of those two is not a result.
