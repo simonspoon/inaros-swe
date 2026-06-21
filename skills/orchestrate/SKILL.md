@@ -93,7 +93,7 @@ mesa task status is the source of truth; survives compaction (re-query, don't ho
 Run carries through all 5 steps in one go. The PO "User confirms" is a **checkpoint, not a terminus** — do not stop there. If you must pause for confirmation, still lay out the dispatch plan in the same response: epic-orch fan-out per epic, depth levels (main 0 / epic-orch 1 / engineer 2 / fan-out 3), and the concurrency cap. A spec with no dispatch plan is half-done.
 
 1. **PO** → mesa project (resolve/create) + spec task; `.scratch/mesa.json`. User confirms. (flat)
-2. **Planner** reads spec (`mesa task show <spec-id>`). Large spec → epic parent tasks first, then **fan out per-epic planners** (depth 1) — each creates only its epic's story tasks. Avoids one planner overflowing on 100 stories. Small spec → single planner, flat story list under the spec. Sets umbrella tasks (spec, epics) `in_progress`.
+2. **Planner** reads spec (`mesa task show <spec-id>`). Large spec → epic parent tasks first, then **fan out per-epic planners** (depth 1) — each creates only its epic's story tasks. Avoids one planner overflowing on 100 stories. Small spec → single planner, flat story list under the spec. Sets umbrella tasks (spec, epics) `in_progress`. **Two umbrella rules the dispatch loop depends on:** (a) any TODO/parent that gains child stories MUST be flipped `in_progress` too — else `task next`/`--unblocked` returns both the parent and its leaf, dispatching the same work twice; (b) point cross-story block edges at the concrete **foundation child story**, not the umbrella (`block <dep-story> --by <foundation-story>`, not `--by <umbrella>`) — so lanes coordinate purely on leaf `done` with no umbrella-close handshake.
 3. **Architect** → contracts/ADRs. Cross-cutting → `.scratch/arch.md`; epic-local → `epics/NN/arch.md`. (flat; may fan out for codebase mapping)
 4. **Dispatch** — driven by `mesa task next --project <P>` (leaf stories only):
    - Each engineer flips its story `in_progress` → `done` + `--artifact`, writes full result to `result.md`, returns **one status line** (`<id> <status> [note]`, status ∈ pass | blocked | conflict) — never the payload.
@@ -104,6 +104,15 @@ Run carries through all 5 steps in one go. The PO "User confirms" is a **checkpo
 ## Parallel writes
 
 Concurrent engineers touching the same source → **worktree-isolate** (`isolation: worktree`). Per-story `result.md` paths never collide; source files can. Isolate only when concurrent writers overlap — it costs setup + disk.
+
+**Expensive shared build (e.g. a 10–40 min OCCT/native compile)?** Worktree-per-agent multiplies that build — avoid it. Instead split work into **lanes by disjoint directory** (e.g. Rust kernel `cad-*` vs frontend `app/src/*`) that run concurrent on ONE tree, each lane **serial internally** on its hot files. Front-load the story that unifies the build (shared target dir) so every later build pays the native compile once.
+
+## Cross-lane coordination
+
+When two concurrent lanes have cross-dependencies (a story in lane B needs a story in lane A), **coordinate from the main loop, not from inside a lane-orchestrator.** A lane-orch that must block on another lane's deliverable tends to *come to rest* rather than sleep-poll for hours — and a rested background sub-agent **cannot be assumed resumable** (no `SendMessage` in some harnesses; re-spawning a fresh stateless orch is the fallback). So:
+- Make dependencies leaf-to-leaf in mesa (see step 2) so unblocking is automatic on `done`.
+- Drive the wait from main with a **Monitor** polling `mesa task list --status todo --unblocked` (or per-story status); on each unblock event, dispatch that engineer. This survives sub-agents resting and avoids a deadlock where lane A waits for lane B's story while lane B sits idle.
+- Beware mutual cross-lane deadlock (A's last story needs B's story that needs A's earlier story): drive B's blocking story to `done` *while A is still working its independent stories*, before A reaches the dependent one.
 
 ## Concurrency
 

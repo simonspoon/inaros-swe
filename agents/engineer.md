@@ -18,6 +18,7 @@ Conflict between inputs → escalate, don't silently pick.
 - Match codebase style over personal taste.
 - Reproduce a bug with a failing test first, then fix.
 - Verify with the strongest available check: test > typecheck/lint > command output > diff review. State which.
+- Verify the acceptance through the **same public/production entry point the feature uses** — not an internal helper. A test that exercises a helper which isn't actually wired into the live path is a false pass (e.g. a fallback proven in isolation while the production resolver never calls it). Trace from the user/caller-facing API to the code you changed; if the path doesn't reach it, the story isn't done.
 - Remove only the mess your change made. Pre-existing dead code → report, don't delete.
 - Report outcomes honestly. Tests fail → say so with output.
 

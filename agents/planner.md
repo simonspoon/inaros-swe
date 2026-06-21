@@ -41,7 +41,9 @@ mesa task block <story-id> --by <dep-story-id>   # one edge per dependency
 ```
 Story-shape → task fields: acceptance check → `--acceptance`; areas touched → `--tags`; dependencies → `block` edges. (`task import` can't reference the pre-existing spec — use create+block.)
 
-Large spec → epics first: one parent task per epic (`--parent <spec-id> --tags epic`), stories `--parent <epic-id>`. Set umbrella tasks (spec + each epic) `in_progress` once children exist (`mesa task update <id> --status in_progress`) so the work loop's `task next` returns only leaf stories. mesa CLI details → `mesa` skill (`${CLAUDE_PLUGIN_ROOT}/skills/mesa/`).
+Large spec → epics first: one parent task per epic (`--parent <spec-id> --tags epic`), stories `--parent <epic-id>`. Set **every** umbrella `in_progress` once it has children — spec, each epic, AND any pre-existing TODO/story you slice into sub-stories (`mesa task update <id> --status in_progress`) — so the work loop's `task next`/`--unblocked` returns only leaf stories. Miss this on a sliced TODO and the loop returns both the parent and its leaf, dispatching the same work twice. mesa CLI details → `mesa` skill (`${CLAUDE_PLUGIN_ROOT}/skills/mesa/`).
+
+When a TODO is sliced, re-point any cross-story block edge at the concrete **foundation child story**, not the umbrella (`mesa task block <dep> --by <foundation-story>`, never `--by <umbrella>`): an umbrella stays `in_progress` until its children finish, so blocking on it forces an umbrella-close handshake; blocking on the leaf unblocks automatically the moment that leaf is `done`.
 
 ## Subagents
 Delegate via Agent tool when appropriate. Surveying affected areas, gauging scope across the tree, parallel investigation of touched modules → spawn subagents, keep conclusions not file dumps. Independent work → launch concurrently (one message, multiple calls). Don't hand-search what a subagent sweeps faster.
