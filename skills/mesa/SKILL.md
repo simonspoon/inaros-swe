@@ -1,17 +1,18 @@
 ---
 name: mesa
-description: Drive the mesa CLI — local-first project management for humans and agents (projects, tasks with dependencies/subtasks, and visual storyboards). Use to create/list/inspect/update projects and tasks, model task dependency graphs, pick the next actionable task, build storyboards, or run the mesa web UI. Use whenever the user mentions mesa, or wants a durable local task/project store an agent can read and mutate.
+description: Drive the mesa CLI — local-first project management for humans and agents (projects, tasks with dependencies/subtasks, visual storyboards, and a per-project bulletin board). Use to create/list/inspect/update projects and tasks, model task dependency graphs, pick the next actionable task, build storyboards, post findings/news/questions to a project's bulletin board, or run the mesa web UI. Use whenever the user mentions mesa, or wants a durable local task/project store an agent can read and mutate.
 ---
 
 # Mesa — local-first project management CLI
 
-Single binary `mesa`. Four command groups: `project`, `task`, `storyboard`; plus ops `serve`, `backup`. Written against mesa 0.1.0 — behavior surprises → `mesa --version` and `mesa <cmd> --help`.
+Single binary `mesa`. Four command groups: `project`, `task`, `storyboard`, `post`; plus ops `serve`, `backup`. Written against mesa 0.1.0 — behavior surprises → `mesa --version` and `mesa <cmd> --help`.
 
 ## Model
 
-- **Project** = top container. Owns tasks + storyboards. Delete cascades to both.
+- **Project** = top container. Owns tasks, storyboards, posts. Delete cascades to all three.
 - **Task** = unit of work in exactly one project (fixed at creation). Forms two graphs: `--parent` (subtask tree, cascade-delete) and `block`/`--by` edges (dependency DAG, cycle-rejected). `blocked` = true while any blocker not done/cancelled — informational, blocked task still closeable.
 - **Storyboard** = freeform canvas in one project: frames (cards, optionally task-linked) + directed edges (cycles allowed). Visual, not a dependency graph.
+- **Post** = bulletin-board message in one project (findings, news, questions). One-level threads: top-level post + replies. Free-text `tag` + `author`, not enums. The async channel agents/people share over a project.
 
 ## Output contract — same for every command
 
@@ -28,6 +29,7 @@ Single binary `mesa`. Four command groups: `project`, `task`, `storyboard`; plus
 | Projects | create / list / show / update / delete | `reference/project.md` |
 | Tasks + dependency graph | create / list / next / show / update / delete / block / unblock / events / import | `reference/task.md` |
 | Storyboards | create / list / show / update / delete / events / frame / edge | `reference/storyboard.md` |
+| Bulletin board (posts) | create / reply / list / show / update / delete | `reference/post.md` |
 | Web UI / HTTP server | serve | `reference/serve.md` |
 | Snapshots | backup | `reference/backup.md` |
 
