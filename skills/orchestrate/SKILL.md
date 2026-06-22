@@ -11,13 +11,15 @@ Pipeline agents carry the `Skill` tool — invoke skills directly (this `orchest
 
 ## Mesa backbone
 
-Specs + status live in **mesa**, not files. `.scratch/` holds only arch docs + engineer results. mesa CLI details → `mesa` skill (`${CLAUDE_PLUGIN_ROOT}/skills/mesa/`).
+Dependency graph + status live in **mesa**, not files — so an agent queries the next-actionable story (`task next`) instead of holding or traversing the DAG in context. That server-side graph resolution is mesa's specific win; pointers-not-payloads (below) is store-agnostic — credit it there, not here. `.scratch/` holds only arch docs + engineer results. mesa CLI details → `mesa` skill (`${CLAUDE_PLUGIN_ROOT}/skills/mesa/`).
 
 - **Project** = the repo. Resolve: `mesa project list` → match `name` == repo basename (`basename "$(git rev-parse --show-toplevel)"`); none → `mesa project create "<basename>"`. PO does this at entry, caches `{project,spec}` in `.scratch/mesa.json`.
 - **Spec** = one parent task (`tag=spec`, description = spec body). **Stories** = child tasks (`--parent`), `--acceptance` = verify check, `block` edges = deps. **Epics** (large) = intermediate parent tasks (`tag=epic`).
 - **Umbrella tasks** (spec, epics) set `in_progress` once children exist → excluded from `task next`, which then returns only leaf stories.
 - **Work loop**: `mesa task next --project <P>` = next actionable (todo + unblocked) story → dispatch engineer. `mesa task list --project <P> --status todo --unblocked` = the concurrent batch. `.next == null` + counts (`{blocked,in_progress,todo}`) = done vs in-flight vs stuck.
-- **Status = source of truth** in mesa. Engineer flips `in_progress` → `done` + `--artifact "<result.md | SHA>"`. No ledger.
+- **Status = source of truth** in mesa. Engineer flips `in_progress` → `done` + `--artifact "<X>"` (`<X>` = the `result.md` path, else the commit SHA — one value). No ledger.
+- **Agents never run `mesa serve` or `mesa delete`.** `serve` opens an outbound HTTP surface (exfil leg); `delete` cascades the whole subtree unconfirmed (wipes the backbone). Both human-operated, out-of-band.
+- **Trust the cached project id, not the name.** Resolve by basename once (PO / recovery); thereafter read the `project` id from `.scratch/mesa.json`. Basename match is first-resolve only — two repos sharing a basename collide into one project.
 
 ## Two axes — don't conflate
 
@@ -84,9 +86,9 @@ Story dirs key off the mesa story task id. Small task → flatten: `.scratch/{me
 ## Status = mesa (no ledger)
 
 mesa task status is the source of truth; survives compaction (re-query, don't hold).
-- Engineer: `in_progress` on start → `done` + `--artifact "<result.md path | commit SHA>"` on pass. `--artifact` is the pointer to the full result.
+- Engineer: `in_progress` on start → `done` + `--artifact "<X>"` on pass (`<X>` = `result.md` path, else commit SHA — one value). `--artifact` is the pointer to the full result.
 - Orchestrator: read state via `mesa task list/next --project <P>`; never hold the task list in context as the database — it's in mesa.
-- blocked/conflict → task left not-done; engineer's returned status line carries the note; orchestrator re-dispatches or escalates.
+- blocked/conflict → engineer reverts the story to `todo` with `--artifact` pointing at its `result.md` (no `blocked` status exists — `blocked` is edge-derived, not settable) and writes the blocker reason into that `result.md`; a reverted story is thus a `todo` carrying an artifact pointer that survives compaction — orchestrator reads it before re-dispatching, then re-dispatches or escalates.
 
 ## Big-task flow
 
@@ -120,4 +122,4 @@ Cap ~ min(16, cores−2) concurrent per orchestrator; excess queues. Dispatch as
 
 ## Recovery / compaction
 
-State lives in mesa (+ `.scratch/` for arch/results). After compaction or restart: re-read `.scratch/mesa.json` (missing → re-resolve project by repo basename, spec by `tag=spec`), then `mesa task next --project <P>` / `task list` to resume from the first actionable story. Never hold the task list in context as the database — it's in mesa.
+State lives in mesa (+ `.scratch/` for arch/results). After compaction or restart: re-read `.scratch/mesa.json` (missing → re-resolve project by repo basename, spec by `tag=spec`; >1 match on either → STOP, surface to the user/main, don't guess — resuming against the wrong project corrupts state), then `mesa task next --project <P>` / `task list` to resume from the first actionable story. Never hold the task list in context as the database — it's in mesa.
