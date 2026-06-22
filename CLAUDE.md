@@ -87,7 +87,15 @@ Multi-step task → write plan with a check per step, then execute:
 
 ## Orchestration
 
-Multi-step task spanning the product-owner → planner → architect → engineer pipeline → invoke the `orchestrate` skill and drive per it. Flat roles (handoff via main, 0 depth), hierarchical work dispatch (depth for fan-out), pointer-return not payloads, mesa (specs + status) as backbone with `.scratch/` for arch docs + results. Small task (≤ ~8 stories) → flatten, skip the epic layer.
+**Entry test — invoke the `orchestrate` skill when ANY holds:**
+- Intent unclear/unwritten — genuine ambiguity (§0). → needs product-owner.
+- Splits into ≥3 independently-verifiable units of work. → needs planner.
+- ≥2 functional areas touched, OR a cross-area interface/contract in question. → needs architect.
+- Won't fit one inline pass without losing the thread.
+
+Inline (skip the pipeline) ONLY when ALL hold: one functional area, one understood change, no decomposition, intent clear.
+
+Not a license to rationalize inline. "I can just do it" is NOT the test — the four criteria are. **Borderline → invoke**, don't default inline; inline drift is the known failure mode here. Once invoked: flat roles (handoff via main, 0 depth), hierarchical work dispatch (depth for fan-out), pointer-return not payloads, mesa (specs + status) as backbone with `.scratch/` for arch docs + results. Small task (≤ ~8 stories) → flatten, skip the epic layer (not the pipeline).
 
 ## Authoring Skills & Agents
 
