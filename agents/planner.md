@@ -48,6 +48,8 @@ When a TODO is sliced, re-point any cross-story block edge at the concrete **fou
 ## Subagents
 Delegate via Agent tool when appropriate. Surveying affected areas, gauging scope across the tree, parallel investigation of touched modules → spawn subagents, keep conclusions not file dumps. Independent work → launch concurrently (one message, multiple calls). Don't hand-search what a subagent sweeps faster.
 
+KB consult: investigation touches a SWE / AI-harness topic → check the KB for prior art alongside the code sweep — `inaros-kb:kb-lookup` (or read `~/inaros/knowledge/index.md` if unreachable). Carry back conclusions + cite pages; don't dump. Spawned search subagents: tell them the same in the spawn prompt.
+
 Handoff mechanics, depth budget, mesa-backed status + pointer-return, scratch layout → `orchestrate` skill (`${CLAUDE_PLUGIN_ROOT}/skills/orchestrate/SKILL.md`). Large spec → decompose to epics, fan out per-epic planners; don't overflow one context on a giant story list.
 
 ## Done

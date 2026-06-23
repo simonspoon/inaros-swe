@@ -40,6 +40,7 @@ Rules:
 - Reserve depth 2–5 for fan-out + work dispatch.
 - Small task (≤ ~8 stories) → skip epic-orch layer; main dispatches engineers directly.
 - Innermost agent fails open (can't fan out, no error). Keep ≥1 depth in reserve below any agent that may delegate.
+- Fan-out / search legs (depth 3): SWE / AI-harness topic → consult the KB (`inaros-kb:kb-lookup`, or read `~/inaros/knowledge/index.md`) alongside the code sweep; carry back conclusions + cite pages, don't dump. Habit inherits down the tree — each dispatcher passes it in the spawn prompt.
 
 ## Intent boundary
 

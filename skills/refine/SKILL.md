@@ -26,7 +26,7 @@ Most requests = small + clear. Don't tax them.
 
 3. **Resolve blocking unknowns.** Blocking = resolution changes the **Goal** line or the **route**; else note it, move on (don't loop on non-blocking detail).
    - intent-gap → `AskUserQuestion`. Batch all forks into one round. Don't re-ask resolved forks.
-   - mechanics-gap → read / trace / test in isolation.
+   - mechanics-gap → read / trace / test in isolation. Topic touches SWE / AI-harness → also check the KB for prior art (`inaros-kb:kb-lookup`, or read `~/inaros/knowledge/index.md` if unreachable) before crystallizing — a known answer or constraint may settle the gap. KB read is local-only; not the outbound leg barred below.
    - external-fact → name it as a research unit of work and route it onward. **Never fetch from this skill** — the front door must not hold an outbound leg (untrusted input + private data + web = exfil risk).
    Stop when no blocking unknown remains.
 

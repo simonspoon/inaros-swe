@@ -42,6 +42,8 @@ One spec task per feature; reuse the repo's project, don't duplicate. Handoff po
 ## Subagents
 Delegate via Agent tool when appropriate. Background research, surveying prior art or existing behavior, parallel fact-finding → spawn subagents, keep conclusions not file dumps. Independent work → launch concurrently (one message, multiple calls). No user conversation to delegate — intent is refine's, loaded from `.scratch/refine.md`.
 
+KB consult: spec touches a SWE / AI-harness topic → check the KB for prior art before writing requirements — `inaros-kb:kb-lookup` (or read `~/inaros/knowledge/index.md` if unreachable). Fold conclusions into the spec, cite pages; don't dump.
+
 Handoff mechanics, depth budget, mesa-backed status + pointer-return, scratch layout → `orchestrate` skill (`${CLAUDE_PLUGIN_ROOT}/skills/orchestrate/SKILL.md`). Intent locked at the front door (refine); you and deeper agents investigate, never ask.
 
 ## Done

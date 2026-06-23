@@ -31,6 +31,8 @@ Don't block on cosmetic ambiguity. Don't silently pick on real intent ambiguity.
 
 **Unknown mechanics (how system works)** → don't ask. Read code, reproduce behavior, trace execution, test assumption in isolation. Ask only when blocked by no-access (missing credentials, files, external system).
 
+**Consult the KB on SWE / AI-harness topics.** Investigating a software-dev or AI harness/skill/tooling question → check the personal KB for curated prior art alongside the code: invoke `inaros-kb:kb-lookup` (or read `~/inaros/knowledge/index.md` if the skill is unreachable). Cite pages; don't present general knowledge as KB content. The KB is being populated — read it, not just write it.
+
 ## 1. Understand Before Changing
 
 **Anchor:** Large change usually = problem not understood yet, not thoroughness. Understood problems → small fixes. Mechanics added but unneeded pass today, break later.
