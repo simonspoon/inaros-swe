@@ -43,8 +43,8 @@ Rules:
 
 ## Intent boundary
 
-- Intent locked at **depth 1 only** — product-owner holds `AskUserQuestion`; main can ask. Below depth 1 = mechanics-only, investigate never ask (CLAUDE.md §0).
-- Deep subagents never talk to the user. Blocked-on-no-access → return `blocked`, bubble up to depth 1.
+- Intent locked at the **front door** — the `refine` skill (main loop) captures intent and holds `AskUserQuestion`; it crystallizes Problem / Knowledge / Goal to `.scratch/refine.md` before routing here. product-owner **loads that artifact and does NOT re-interview**; main can still ask. Below the front door = mechanics-only, investigate never ask (CLAUDE.md §0).
+- Deep subagents never talk to the user. Blocked-on-no-access → return `blocked`, bubble up to the front door.
 - Once the user signals to drive (spec confirmed, or an explicit "proceed" / "you know what you're doing"), carry through the remaining stages and report results — don't surface next-step permission menus ("want me to hand off / kick off the engineer next?") between stages. Pause only for a genuine intent fork or a blocker, not to ask "shall I continue?".
 
 ## Context discipline — pointers, not payloads
@@ -71,6 +71,7 @@ Specs + status in mesa. `.scratch/` holds the rest, git-excluded. State = mesa +
 
 ```
 .scratch/
+  refine.md                 refine: crystallized Problem / Knowledge / Goal (front door)
   mesa.json                 {project,spec} pointer cache (product-owner)
   arch.md                   architect: cross-cutting design
   epics/
@@ -92,9 +93,10 @@ mesa task status is the source of truth; survives compaction (re-query, don't ho
 
 ## Big-task flow
 
-Run carries through all 5 steps in one go. The PO "User confirms" is a **checkpoint, not a terminus** — do not stop there. If you must pause for confirmation, still lay out the dispatch plan in the same response: epic-orch fan-out per epic, depth levels (main 0 / epic-orch 1 / engineer 2 / fan-out 3), and the concurrency cap. A spec with no dispatch plan is half-done.
+Run carries through all steps in one go. refine's intent confirm (at the front door) is a **checkpoint, not a terminus** — once it routed here, don't re-pause at PO. If you must pause for confirmation, still lay out the dispatch plan in the same response: epic-orch fan-out per epic, depth levels (main 0 / epic-orch 1 / engineer 2 / fan-out 3), and the concurrency cap. A spec with no dispatch plan is half-done.
 
-1. **PO** → mesa project (resolve/create) + spec task; `.scratch/mesa.json`. User confirms. (flat)
+0. **refine** (front door) already ran — captured intent, wrote `.scratch/refine.md`, confirmed Problem + Goal with the user, routed here. (main loop)
+1. **PO** loads `.scratch/refine.md` → expands into the spec → mesa project (resolve/create) + spec task; `.scratch/mesa.json`. No re-interview. (flat)
 2. **Planner** reads spec (`mesa task show <spec-id>`). Large spec → epic parent tasks first, then **fan out per-epic planners** (depth 1) — each creates only its epic's story tasks. Avoids one planner overflowing on 100 stories. Small spec → single planner, flat story list under the spec. Sets umbrella tasks (spec, epics) `in_progress`. **Two umbrella rules the dispatch loop depends on:** (a) any TODO/parent that gains child stories MUST be flipped `in_progress` too — else `task next`/`--unblocked` returns both the parent and its leaf, dispatching the same work twice; (b) point cross-story block edges at the concrete **foundation child story**, not the umbrella (`block <dep-story> --by <foundation-story>`, not `--by <umbrella>`) — so lanes coordinate purely on leaf `done` with no umbrella-close handshake.
 3. **Architect** → contracts/ADRs. Cross-cutting → `.scratch/arch.md`; epic-local → `epics/NN/arch.md`. (flat; may fan out for codebase mapping)
 4. **Dispatch** — driven by `mesa task next --project <P>` (leaf stories only):

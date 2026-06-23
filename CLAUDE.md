@@ -87,8 +87,10 @@ Multi-step task → write plan with a check per step, then execute:
 
 ## Orchestration
 
+**Front door = `refine` skill.** Non-trivial request → run `refine` first: it restates intent, resolves unknowns (interviews genuine intent forks, reads mechanics, flags external facts for research), crystallizes Problem / Knowledge / Goal, then applies the entry test below to route. refine owns intent capture and holds `AskUserQuestion`; product-owner consumes refine's crystallized intent (`.scratch/refine.md`) and never re-interviews.
+
 **Entry test — invoke the `orchestrate` skill when ANY holds:**
-- Intent unclear/unwritten — genuine ambiguity (§0). → needs product-owner.
+- Intent unclear/unwritten — genuine ambiguity (§0). → product-owner specs it (refine already captured the intent).
 - Splits into ≥3 independently-verifiable units of work. → needs planner.
 - ≥2 functional areas touched, OR a cross-area interface/contract in question. → needs architect.
 - Won't fit one inline pass without losing the thread.
