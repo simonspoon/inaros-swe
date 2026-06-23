@@ -35,7 +35,7 @@ Most requests = small + clear. Don't tax them.
    - **Knowledge** — only facts that bound the Goal or the route, each tagged source (`prompt` | `code` | `memory` | `user`). Code/memory-derived = untrusted until verified — mark it. No fact, no line.
    - **Goal** — observable outcome (a pass/fail an observer could check).
 
-5. **Route** — apply the entry test in **CLAUDE.md §Orchestration verbatim; do not restate its conditions** (it is the single source of truth — if a label below drifts, CLAUDE.md wins). Emit which legs fired, inspectable:
+5. **Route** — always emit ONE verdict NOW (never two, never deferred), even with an intent fork still open. The "intent unclear" leg fires only for intent you cannot settle at the front door (genuinely unwritten / needs a full spec) — NOT a cheap fork you resolve via `AskUserQuestion`. So: any non-intent leg fires (≥3 units / ≥2 areas / won't-fit-one-pass) → ORCHESTRATE now, regardless of the open fork; else a cheap fork on a one-area, one-change task → resolve it, route INLINE. Apply the entry test in **CLAUDE.md §Orchestration verbatim; do not restate its conditions** (it is the single source of truth — if a label below drifts, CLAUDE.md wins). Emit which legs fired, inspectable:
    ```
    Route: <INLINE | ORCHESTRATE>
    - intent unclear / unwritten?          <yes|no>
