@@ -34,7 +34,7 @@ Input + output both in mesa. Read pointers from `.scratch/mesa.json` (`{project,
 
 Each story = one child task under the spec; wire deps with block edges:
 ```bash
-mesa task create --project <P> "<title>" --parent <spec-id> \
+mesa task create --project <P> --title "<title>" --parent <spec-id> \
   --acceptance "<pass/fail check>" --priority high|medium|low --tags <areas> \
   --description "<goal / scope / out-of-scope / areas touched>"
 mesa task block <story-id> --by <dep-story-id>   # one edge per dependency

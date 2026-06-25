@@ -31,7 +31,7 @@ Spec lives in mesa as a task, not a file. Steps:
 1. Resolve project. `mesa project list` → match project whose `name` == repo basename (`basename "$(git rev-parse --show-toplevel)"`). None → `mesa project create "<basename>"`. Capture id.
 2. Write spec as one parent task:
    ```bash
-   mesa task create --project <P> "Spec: <feature>" --tags spec \
+   mesa task create --project <P> --title "Spec: <feature>" --tags spec \
      --description "<full spec body: Problem / Goal / Requirements (must|should|won't) / Constraints / Assumptions>"
    ```
    Capture the spec task id.
