@@ -6,8 +6,15 @@
 # enforces: it forces (at most) one review prompt per distinct diff state — it can't
 # verify the agent actually reviewed, only that it was told to before stopping.
 #
-# Inert when: not a git repo, diff below threshold, or this exact diff was already
-# prompted (loop-safe). Committing the change clears the gate (diff vs HEAD empties).
+# Inert when: not a git repo, background work is in flight (see below), diff below
+# threshold, or this exact diff was already prompted (loop-safe). Committing the
+# change clears the gate (diff vs HEAD empties).
+#
+# Background-work skip (the main agent stopping while work continues isn't a finish):
+#   - Orchestration mid-flight — mesa is the pipeline's state of truth; any in_progress
+#     task for this repo's cached project (.scratch/mesa.json) means engineers are live.
+#   - Skip marker — any background workflow can suppress the gate by touching
+#     "$(git rev-parse --git-dir)/inaros-review-gate-off", and re-arm by removing it.
 #
 # Tunables (env): REVIEW_GATE_MIN_LINES (default 40), REVIEW_GATE_MIN_FILES (default 3).
 # To make it ADVISORY instead of blocking: change the final `exit 2` to `exit 0`
@@ -27,6 +34,20 @@ esac
 root="${CLAUDE_PROJECT_DIR:-$PWD}"
 cd "$root" 2>/dev/null || exit 0
 git rev-parse --is-inside-work-tree >/dev/null 2>&1 || exit 0
+gitdir="$(git rev-parse --git-dir 2>/dev/null)" || exit 0
+
+# Background work in flight → the stop is the main agent yielding, not finishing. Skip.
+# (1) Explicit marker: a background workflow touches this to suppress, removes it to re-arm.
+[ -e "$gitdir/inaros-review-gate-off" ] && exit 0
+# (2) Orchestration mid-flight: any in_progress mesa task for this repo's cached project.
+scratch="$root/.scratch/mesa.json"
+if [ -f "$scratch" ] && command -v mesa >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+  pid="$(jq -r '.project // empty | if type=="object" then .id else . end' "$scratch" 2>/dev/null)"
+  if [ -n "$pid" ]; then
+    n="$(mesa task list --project "$pid" --status in_progress 2>/dev/null | jq 'length' 2>/dev/null)"
+    [ "${n:-0}" -gt 0 ] && exit 0
+  fi
+fi
 
 # Tracked changes vs HEAD (staged + unstaged). Binary files ("-") count as 0 lines.
 stat="$(git diff HEAD --numstat 2>/dev/null \
@@ -39,7 +60,6 @@ if [ "${files:-0}" -lt "$MIN_FILES" ] && [ "${lines:-0}" -lt "$MIN_LINES" ]; the
 fi
 
 # Loop guard: prompt at most once per distinct diff. State lives in .git (never committed).
-gitdir="$(git rev-parse --git-dir 2>/dev/null)" || exit 0
 state="$gitdir/inaros-review-gate"
 cur="$(git diff HEAD | git hash-object --stdin 2>/dev/null || echo none)"
 prev="$(cat "$state" 2>/dev/null || true)"

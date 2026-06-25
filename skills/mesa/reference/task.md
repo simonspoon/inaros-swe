@@ -27,6 +27,20 @@ update adds: `--title` · `--status todo|in_progress|done|cancelled` · `--no-pa
 - `--description ""` / `--acceptance ""` / `--artifact ""` clear those fields.
 - `--tags` **REPLACES** the full tag set; `--tags ""` clears all tags. Not additive.
 
+### Long text from a file (`--description-file` / `--acceptance-file`)
+
+On create AND update: `--description-file <path>` / `--acceptance-file <path>` read the field from a file (`-` = **stdin**) instead of an inline arg — content is read **verbatim**, so multi-line text with shell metacharacters (backticks, `$()`, `<>`) round-trips byte-for-byte. **This is the fix for the shell-mangling gotcha below** — prefer it over Python-subprocess for long/structured bodies.
+
+- Each `*-file` flag **conflicts** with its inline twin (`--description` vs `--description-file`) → usage error, exit 2.
+- Only **one** field may read `-` (stdin) per invocation → two `-` is exit 2.
+- Missing/unreadable path → `validation` error, exit 1.
+- On update, a `*-file` flag counts toward the ≥1-field requirement.
+
+```bash
+mesa task create --project 1 "Spec" --description-file ./spec.md          # from file
+printf 'body with `backticks`\n' | mesa task update 7 --acceptance-file -  # from stdin
+```
+
 ## list filters (combine with AND)
 
 `--project <P>` · `--status <S>` · `--tag <T>` · `--unblocked`.
