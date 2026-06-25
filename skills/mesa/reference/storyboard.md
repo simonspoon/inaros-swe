@@ -8,7 +8,7 @@ Sub-groups: storyboard itself, `frame`, `edge`.
 
 | Command | Purpose |
 |---|---|
-| `mesa storyboard create --project <P> <TITLE> [--description <D>] [--author <A>]` | Create; full object. |
+| `mesa storyboard create --project <P> --title <TITLE> [--description <D>] [--author <A>]` | Create; full object. |
 | `mesa storyboard list [--project <P>]` | Array, no frames/edges — use `show` for those. |
 | `mesa storyboard show <ID>` | Full contents: `{storyboard, frames, edges}`. |
 | `mesa storyboard update <ID> <--title <T> \| --description <D>> [--author <A>]` | ≥1 field; project + author immutable. |
@@ -19,7 +19,7 @@ Sub-groups: storyboard itself, `frame`, `edge`.
 
 | Command | Purpose |
 |---|---|
-| `mesa storyboard frame create --storyboard <S> <TITLE> [opts]` | Add frame; full object. |
+| `mesa storyboard frame create --storyboard <S> --title <TITLE> [opts]` | Add frame; full object. |
 | `mesa storyboard frame update <ID> <flags>` | ≥1 field. Storyboard + author immutable. |
 | `mesa storyboard frame delete <ID> [--author <A>]` | Delete frame AND edges touching it; echoes `{frame, edges}`. |
 
@@ -48,9 +48,9 @@ Position/size are abstract canvas units the web renders as pixels.
 ## Examples
 
 ```bash
-SB=$(mesa storyboard create --project 1 "Onboarding flow" --author agent-7 | jq .id)
-F1=$(mesa storyboard frame create --storyboard $SB "Land on home" --x 40  --y 40  | jq .id)
-F2=$(mesa storyboard frame create --storyboard $SB "Sign up" --task 7 --color '#ff2bd6' --x 320 --y 40 | jq .id)
+SB=$(mesa storyboard create --project 1 --title "Onboarding flow" --author agent-7 | jq .id)
+F1=$(mesa storyboard frame create --storyboard $SB --title "Land on home" --x 40  --y 40  | jq .id)
+F2=$(mesa storyboard frame create --storyboard $SB --title "Sign up" --task 7 --color '#ff2bd6' --x 320 --y 40 | jq .id)
 mesa storyboard edge create --storyboard $SB --from $F1 --to $F2 --label "then" --author agent-7
 mesa storyboard frame update $F1 --x 120 --y 80          # move it
 mesa storyboard show $SB

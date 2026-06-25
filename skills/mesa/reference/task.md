@@ -6,7 +6,7 @@ Unit of work in exactly one project (immutable after creation). Two graphs: subt
 
 | Command | Purpose |
 |---|---|
-| `mesa task create --project <P> <TITLE> [opts]` | Create; prints full task. |
+| `mesa task create --project <P> --title <TITLE> [opts]` | Create; prints full task. |
 | `mesa task list [filters]` | Compact array (no description). Filters AND together. |
 | `mesa task next [--project <P>]` | Next actionable (todo + unblocked), full object. |
 | `mesa task show <ID>` | Full object incl. description. |
@@ -37,7 +37,7 @@ On create AND update: `--description-file <path>` / `--acceptance-file <path>` r
 - On update, a `*-file` flag counts toward the ≥1-field requirement.
 
 ```bash
-mesa task create --project 1 "Spec" --description-file ./spec.md          # from file
+mesa task create --project 1 --title "Spec" --description-file ./spec.md          # from file
 printf 'body with `backticks`\n' | mesa task update 7 --acceptance-file -  # from stdin
 ```
 
@@ -85,8 +85,8 @@ echo '{"project":1,"tasks":[{"ref":"a","title":"design"},{"ref":"b","title":"bui
 ## Examples
 
 ```bash
-mesa task create --project 1 "Draft homepage copy" --priority high --tags writing,web
-mesa task create --project 1 "Outline" --parent 7        # subtask
+mesa task create --project 1 --title "Draft homepage copy" --priority high --tags writing,web
+mesa task create --project 1 --title "Outline" --parent 7        # subtask
 mesa task update 3 --status in_progress
 mesa task block 3 --by 1                                 # 3 waits on 1
 mesa task next --project 1
