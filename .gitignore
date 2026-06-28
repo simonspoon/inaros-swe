@@ -1,1 +1,11 @@
+# Agent scratch space (specs, story drafts, eval outputs) — local only
 .scratch/
+
+# macOS
+.DS_Store
+
+# Editor cruft
+*.swp
+*~
+.idea/
+.vscode/

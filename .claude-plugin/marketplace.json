@@ -1,0 +1,14 @@
+{
+  "name": "inaros-swe",
+  "owner": {
+    "name": "Simon Spoon",
+    "email": "simon@sjspoon.com"
+  },
+  "plugins": [
+    {
+      "name": "inaros-swe",
+      "source": ".",
+      "description": "Personal inaros skills and agents: orchestration pipeline (product-owner/planner/architect/engineer), AI-expert consults, skill evals, browser/desktop/mobile QA, and session retrospectives."
+    }
+  ]
+}
