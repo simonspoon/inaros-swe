@@ -10,7 +10,7 @@ Single binary `mesa`. Five command groups: `project`, `task`, `storyboard`, `pos
 ## Model
 
 - **Project** = top container. Owns tasks, storyboards, posts. Delete cascades to all three.
-- **Task** = unit of work in exactly one project (fixed at creation). Forms two graphs: `--parent` (subtask tree, cascade-delete) and `block`/`--by` edges (dependency DAG, cycle-rejected). `blocked` = true while any blocker not done/cancelled — informational, blocked task still closeable.
+- **Task** = unit of work in exactly one project (fixed at creation). `status` ∈ `todo|in_progress|done|cancelled` — exact values, no synonyms ("doing" is rejected). Forms two graphs: `--parent` (subtask tree, cascade-delete) and `block`/`--by` edges (dependency DAG, cycle-rejected). `blocked` = true while any blocker not done/cancelled — informational, blocked task still closeable.
 - **Storyboard** = freeform canvas in one project: frames (cards, optionally task-linked) + directed edges (cycles allowed). Visual, not a dependency graph.
 - **Post** = bulletin-board message in one project (findings, news, questions). One-level threads: top-level post + replies. Free-text `tag` + `author`, not enums. The async channel agents/people share over a project.
 - **Inbox item** = free-text message in the one GLOBAL inbox (not tied to a project). Lands UNASSIGNED — agent uses it for whatever purpose. No auto-routing: a human routes it later with `inbox assign`, which CONVERTS it into a todo task in that project (and deletes the item); naming a project in the body does nothing.

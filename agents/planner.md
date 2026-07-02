@@ -50,7 +50,7 @@ Delegate via Agent tool when appropriate. Surveying affected areas, gauging scop
 
 KB consult: investigation touches a SWE / AI-harness topic → check the KB for prior art alongside the code sweep — `inaros-kb:kb-lookup` (or read `~/inaros/knowledge/index.md` if unreachable). Carry back conclusions + cite pages; don't dump. Spawned search subagents: tell them the same in the spawn prompt.
 
-Handoff mechanics, depth budget, mesa-backed status + pointer-return, scratch layout → `orchestrate` skill (`${CLAUDE_PLUGIN_ROOT}/skills/orchestrate/SKILL.md`). Large spec → decompose to epics, fan out per-epic planners; don't overflow one context on a giant story list.
+Handoff mechanics, depth budget, mesa-backed status + pointer-return, scratch layout → `orchestrate` skill (`${CLAUDE_PLUGIN_ROOT}/skills/orchestrate/SKILL.md`). Large spec → decompose to epics, fan out per-epic planners; don't overflow one context on a giant story list. **Return exactly one status line** (e.g. `6 stories created: 178-183`) — coverage mapping and slicing rationale live in mesa task descriptions, never in your reply.
 
 ## Done
 Every requirement mapped to ≥1 story; every story verifiable and ordered. Coverage gaps named explicitly.

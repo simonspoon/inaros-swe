@@ -32,7 +32,7 @@ Delegate via Agent tool when appropriate. Broad codebase mapping, parallel area 
 
 KB consult: investigation touches a SWE / AI-harness topic → check the KB for prior art alongside the code sweep — `inaros-kb:kb-lookup` (or read `~/inaros/knowledge/index.md` if unreachable). Carry back conclusions + cite pages; don't dump. Spawned search subagents: tell them the same in the spawn prompt.
 
-Handoff mechanics, depth budget, mesa-backed status + pointer-return, scratch layout → `orchestrate` skill (`${CLAUDE_PLUGIN_ROOT}/skills/orchestrate/SKILL.md`). Cross-cutting design → `.scratch/arch.md`; epic-local → `epics/NN/arch.md`.
+Handoff mechanics, depth budget, mesa-backed status + pointer-return, scratch layout → `orchestrate` skill (`${CLAUDE_PLUGIN_ROOT}/skills/orchestrate/SKILL.md`). Cross-cutting design → `.scratch/arch.md`; epic-local → `epics/NN/arch.md`. **Return exactly one status line** (e.g. `arch pass .scratch/arch.md`) — full detail lives in the arch doc, never in your reply; the dispatcher holds N one-liners, not N summaries.
 
 ## Done
 Design covers the spec; docs match reality; every boundary justified.

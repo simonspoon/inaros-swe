@@ -7,7 +7,7 @@ Unit of work in exactly one project (immutable after creation). Two graphs: subt
 | Command | Purpose |
 |---|---|
 | `mesa task create --project <P> --title <TITLE> [opts]` | Create; prints full task. |
-| `mesa task list [filters]` | Compact array (no description). Filters AND together. |
+| `mesa task list [filters]` | Compact array — omits `description`, `acceptance`, `artifact`, timestamps. Filters AND together. Verify `artifact`/`acceptance` with `task show`, NOT `list` (a set field reads as absent/null here). |
 | `mesa task next [--project <P>]` | Next actionable (todo + unblocked), full object. |
 | `mesa task show <ID>` | Full object incl. description. |
 | `mesa task update <ID> <flags>` | Change passed fields only; ≥1 required. |
