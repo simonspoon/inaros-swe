@@ -8,7 +8,7 @@ A [Claude Code](https://docs.claude.com/en/docs/claude-code/overview) plugin: an
 
 - **10 skills** — invocable workflows (orchestration, evals, expert consults, QA drivers, retrospectives).
 - **8 agents** — specialized subagents the skills and the main loop dispatch to.
-- **1 hook** — a Stop-hook code-review gate.
+- **1 hook** — a code-review gate (Stop gate + PostToolUse review marker).
 - **[`CLAUDE.md`](CLAUDE.md)** — the operating principles all of the above follow.
 
 ## Install
@@ -58,7 +58,7 @@ To develop locally instead, clone the repo and add it as a local marketplace:
 
 ## Hook
 
-A **Stop hook** ([`hooks/stop-review-gate.sh`](hooks/stop-review-gate.sh)) acts as a code-review gate: if a turn would finish with a non-trivial, uncommitted, unreviewed diff (default ≥ 40 changed lines **or** ≥ 3 files), it prompts the agent to run `/code-review` first. It's loop-safe (prompts at most once per distinct diff), goes inert when not in a git repo or while orchestration/background work is in flight, and is tunable via `REVIEW_GATE_MIN_LINES` / `REVIEW_GATE_MIN_FILES`. To make it advisory instead of blocking, change the final `exit 2` to `exit 0`.
+A **Stop hook** ([`hooks/stop-review-gate.sh`](hooks/stop-review-gate.sh)) acts as a code-review gate: if a turn would finish with a non-trivial, uncommitted, unreviewed diff (default ≥ 40 changed lines **or** ≥ 3 files), it prompts the agent to run `/code-review` first. A companion **PostToolUse hook** ([`hooks/review-marker.sh`](hooks/review-marker.sh)) records when a review runs, so the diff left after applying a review's findings counts as reviewed and isn't re-gated. It's loop-safe (prompts at most once per distinct diff), goes inert when not in a git repo or while orchestration/background work is in flight, and is tunable via `REVIEW_GATE_MIN_LINES` / `REVIEW_GATE_MIN_FILES`. To make it advisory instead of blocking, change the final `exit 2` to `exit 0`.
 
 ## Philosophy
 

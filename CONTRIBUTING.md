@@ -21,7 +21,7 @@ This is a **personal, opinionated** plugin. It encodes one developer's workflow 
 There's no compiler here — most of this is Markdown instructions. Verify the way the change allows:
 
 - **Behavioral changes to a skill/agent:** use the bundled [`improve-skill`](skills/improve-skill) skill — it drafts test cases from the target's stated job, runs it via subagents, scores outputs with an LLM judge, and re-tests. That's the strongest available check.
-- **Hook changes:** `hooks/stop-review-gate.sh` is plain bash — run it directly with a sample payload on stdin and confirm the exit code (`0` = allow, `2` = block).
+- **Hook changes:** the hooks are plain bash — run them directly with a sample payload on stdin. For `hooks/stop-review-gate.sh`, confirm the exit code (`0` = allow, `2` = block). For `hooks/review-marker.sh` (always exits `0`), confirm the side effect: `.git/inaros-review-done` is touched for a ReportFindings or Skill(code-review) payload and untouched otherwise.
 - **JSON manifests** (`plugin.json`, `marketplace.json`): validate they parse (`jq . <file>`).
 
 ## Submitting

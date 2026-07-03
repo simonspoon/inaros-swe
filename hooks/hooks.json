@@ -1,5 +1,16 @@
 {
   "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Skill|ReportFindings",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/review-marker.sh"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
