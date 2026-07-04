@@ -10,7 +10,7 @@ Front door. Runs before work on a non-trivial request. Capture intent → resolv
 ## Proportionality gate — read first
 
 Most requests = small + clear. Don't tax them.
-- Raw request passes the inline ALL-of test (CLAUDE.md §Orchestration) AND no genuine intent fork → emit one-line restate, proceed inline. Skip the rest.
+- Raw request passes the inline ALL-of test (CLAUDE.md §Orchestration — the *plugin's* CLAUDE.md, `${CLAUDE_PLUGIN_ROOT}/CLAUDE.md`, not the working repo's) AND no genuine intent fork → emit one-line restate, proceed inline. Skip the rest.
 - Else → run the full Pass below.
 - Heavy resolution (multi-file trace, broad survey) → fan to a subagent, carry back only the crystallized output, not the transcript.
 - "Nothing to refine" = valid outcome. Don't manufacture unknowns to justify the skill.

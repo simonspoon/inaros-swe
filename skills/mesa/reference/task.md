@@ -1,6 +1,6 @@
 # mesa task
 
-Unit of work in exactly one project (immutable after creation). Two graphs: subtask tree (`--parent`) and dependency DAG (`block` edges). Every task object carries boolean `blocked`.
+Unit of work in exactly one project (immutable after creation). Two graphs: subtask tree (`--parent`) and dependency DAG (`block` edges). Every task object carries boolean `blocked`. `--project <P>` is a numeric id or a project name (case-insensitive; ambiguous name → `conflict`, unknown → `not_found`).
 
 ## Commands
 
@@ -16,6 +16,7 @@ Unit of work in exactly one project (immutable after creation). Two graphs: subt
 | `mesa task unblock <ID> --on <ON>` | Remove a blocked-by edge. |
 | `mesa task events [ID]` | Status-change log, oldest first. Omit ID for all tasks. |
 | `mesa task import` | Atomic graph import from JSON on stdin. |
+| `mesa task execute <ID>` | Fire the user-configured `task-execute` hook for the task (see below). |
 
 ## create / update flags
 
@@ -80,6 +81,20 @@ Shape:
 
 ```bash
 echo '{"project":1,"tasks":[{"ref":"a","title":"design"},{"ref":"b","title":"build","blocked_by":["a"]}]}' | mesa task import
+```
+
+## execute — fire the task-execute hook
+
+Runs the shell command bound to `"task-execute"` in the hooks file (`hooks.json` beside the db; `MESA_HOOKS_FILE` overrides), with the full task JSON on **stdin**, `MESA_HOOK`/`MESA_TASK_ID`/`MESA_TASK_TITLE`/`MESA_PROJECT_ID`/`MESA_DB` in the env, cwd = the project's `local_path` when that folder exists. Prints a `HookRun`: `{hook, command, exit_code, stdout, stderr}` (output capped 64 KiB).
+
+- Hook's **nonzero exit is data** (`exit_code` field), not a command failure — still exit 0. Branch on `.exit_code`, not the process exit.
+- No hook configured / malformed hooks file → `validation`, exit 1. Shell cannot spawn → `unavailable`, exit 1.
+- No timeout: a hook that should outlive the call must background itself (`… >/dev/null 2>&1 &`).
+- Web UI equivalent: the **Execute** button in the task panel (`POST /api/tasks/{id}/execute`).
+
+```bash
+echo '{"task-execute": "echo \"picked up $MESA_TASK_ID\""}' > "$MESA_HOOKS_FILE"
+mesa task execute 3 | jq .exit_code
 ```
 
 ## Examples
