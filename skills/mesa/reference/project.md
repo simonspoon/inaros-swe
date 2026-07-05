@@ -1,6 +1,6 @@
 # mesa project
 
-Top container. Owns tasks + storyboards + posts; deleting one cascades to all of them.
+Top container. Owns tasks + storyboards; deleting one cascades to both.
 
 ## Commands
 
