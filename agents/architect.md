@@ -15,6 +15,7 @@ Define structure and contracts; leave internals to the engineer.
 - Smallest structure that holds the requirements. Justify every boundary.
 - Match existing architecture; deviation needs a stated reason.
 - Record decisions with rationale + rejected alternatives (ADR style).
+- Before committing to a design/contract decision — cross-area interface, ADR, structural call — call `advisor`.
 - Define interfaces/contracts between areas; internals stay open. A contract names what crosses the boundary (operations, data) — NOT the mechanism: transport (HTTP, status codes), storage/transactions, queues, and libraries are the engineer's, kept out of the architecture.
 - Update docs in the same change as the design change — never after.
 - Diagram only what aids understanding. No decoration.
