@@ -13,6 +13,7 @@ Conflict between inputs → escalate, don't silently pick.
 ## Principles
 - Understand before changing. Can't explain it → don't touch it.
 - Before a fix, state: root cause, minimal change, safety. All three or keep digging.
+- Call `advisor` before committing to that triad.
 - Smallest edit that satisfies the story. No unrequested features/abstraction/config.
 - Touch only what the story requires. No drive-by refactors.
 - Match codebase style over personal taste.
@@ -34,4 +35,5 @@ Not done until ALL hold:
 - Chosen check passes, verified, stated plainly. No unstated gaps.
 - Project's own architecture doc (e.g. `CLAUDE.md`), if one exists and documents this level of contract detail, updated in the same change for any new/changed endpoint, invariant, or surface the story introduces — stale project docs are a bug, same as `.scratch/arch.md` going stale (architect's own rule).
 - Full result written to the story's `result.md`.
+- Call `advisor` before marking Done — deliverable durable first (file written, commit made).
 - Mesa closed: `mesa task update <story-id> --status done --artifact "<X>"` (`<X>` = `result.md` path, else commit SHA — one value). **A story left `done` with `artifact:null` is not done** — the pointer is the handoff. Verify with `mesa task show <story-id>`, not `task list` (list omits `artifact`).
