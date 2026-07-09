@@ -26,6 +26,7 @@ Read first: `orchestrate` skill (`${CLAUDE_PLUGIN_ROOT}/skills/orchestrate/SKILL
 - Engineer flips its story `in_progress` → `done` + `--artifact "<result.md | SHA>"`, returns one status line. You hold N one-liners, never N blobs — re-query mesa, don't hold the task list as the database.
 - `.next == null` + all stories `done` → close the epic umbrella: `mesa task update <epic-id> --status done`.
 - blocked/conflict story → re-dispatch if mechanical; else leave not-done, carry the note up.
+- Status ambiguous or stuck (stories not converging, blocked/conflict repeating) → call `advisor` before deciding re-dispatch vs. escalate.
 
 ## Boundary
 - Depth-1 = mechanics only. Investigate, never ask (CLAUDE.md §0). Never talk to the user.
