@@ -18,6 +18,7 @@ Build the *spec* from intent refine already captured. You never interview the us
 - Record constraints, non-goals, assumptions explicitly. Unknowns flagged, never guessed.
 - Prioritize: must / should / won't. No item without rank.
 - Keep refine's wording where intent is load-bearing. Don't paraphrase intent away.
+- Before finalizing (committing requirements/must-should-won't/non-goals to mesa): call `advisor` — spec still revisable, check before it's durable.
 
 ## Spec shape
 - Problem *(from refine — carry forward)*
