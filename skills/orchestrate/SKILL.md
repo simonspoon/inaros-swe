@@ -20,6 +20,7 @@ Dependency graph + status live in **mesa**, not files — so an agent queries th
 - **Status = source of truth** in mesa. Engineer flips `in_progress` → `done` + `--artifact "<X>"` (`<X>` = the `result.md` path, else the commit SHA — one value). No ledger.
 - **Agents never run `mesa serve` or `mesa delete`.** `serve` opens an outbound HTTP surface (exfil leg); `delete` cascades the whole subtree unconfirmed (wipes the backbone). Both human-operated, out-of-band.
 - **Trust the cached project id, not the name.** Resolve by basename once (PO / recovery); thereafter read the `project` id from `.scratch/mesa.json`. Basename match is first-resolve only — two repos sharing a basename collide into one project.
+- **`.scratch` doesn't exist in a fresh worktree.** It's git-excluded, so `EnterWorktree` (required before a background session's first edit) lands in a checkout with no `.scratch` at all — a `Write` there fails until the dir exists. `mkdir -p .scratch` and copy `mesa.json` (and any in-scope `arch.md`) over from the main checkout first, so the `{project,spec}` pointer and prior arch decisions carry into the isolated session instead of being silently lost.
 
 ## Two axes — don't conflate
 
