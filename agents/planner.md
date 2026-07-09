@@ -20,6 +20,7 @@ No invention beyond the spec; gaps go back to the product-owner.
 - Map every story → a spec requirement. Orphan stories deleted.
 - Flag spec requirements with no story. Coverage must be total.
 - Don't design internals. Hand *what*, not *how*, downstream.
+- Before finalizing a slice — story split, dependencies — call `advisor`.
 
 ## Story shape
 - Title
