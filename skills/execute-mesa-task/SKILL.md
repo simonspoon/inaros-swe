@@ -15,14 +15,15 @@ Glue skill: chains task-pickup → refine → ship → retro → cleanup into on
 4. **Work** — inline pass or full pipeline, per refine's route. Verify per CLAUDE.md §4 (test / typecheck / run+observe / diff-vs-criteria — strongest the task allows).
 5. **Complete** — mesa task → `done` + `--artifact` (result path or commit SHA — one value).
 6. **Commit to main** — direct commit, no PR. Matches this task's own instruction and the user's standing git preference (commit direct to main). This supersedes the background-job default of isolate→PR→ask for *this* explicit instruction only — don't silently fall back to opening a PR, and don't generalize the skip to unrelated commits.
-7. **Retrospective** — invoke `retrospective` skill against this session (task 1–6 + this skill's own run).
-8. **Auto-apply high-confidence findings** — the one place this skill overrides `retrospective`'s default report-only gate, per this workflow's explicit charter. High-confidence = cites a concrete moment from this run AND has a low-blast-radius owner:
+7. **Retrospective (report only)** — invoke `retrospective` skill against this session (task 1–6 + this skill's own run), but stop it at its Step 4 report — **this skill's own step 8 replaces retrospective's Step 5**, don't let the invocation reach retrospective's "wait for user approval" gate. Tell the invocation explicitly it's producing findings for an automated caller, not for a human to approve.
+8. **Auto-apply high-confidence findings** — the one place this skill overrides `retrospective`'s default report-only gate, per this workflow's explicit charter. Do this yourself; never surface `AskUserQuestion` for a finding. High-confidence = cites a concrete moment from this run AND has a low-blast-radius owner:
    - (a) skill wording fix → edit the named `SKILL.md` directly.
    - (c) memory fact → write it (standard memory protocol).
    - (d) KB-worthy → run `/kb-capture`.
    - (e) tool change request → `mesa inbox add`.
    - (b) config / permission / hook change → never auto-apply, even here — `retrospective`'s hard rule survives this override. Print the command for the user.
    No cited moment, or genuinely speculative → leave in the report, don't apply.
+   Confidence itself unclear (moment is cited but you're unsure the fix is right, or blast radius is ambiguous) → consult `advisor`, don't ask the user. Advisor agrees it's safe → apply; advisor flags real risk → treat like (b), print for the user instead of applying.
 9. **Cleanup** — remove this run's temp files; if a worktree was created for the task, verify the commit landed on `main` FIRST (`git log --oneline main..<worktree-branch>` empty, or `git log -1 main` shows the SHA) — the worktree branch is the only copy of the commit until merged, and `ExitWorktree`/`git branch -d` deletes it irreversibly. Only then `ExitWorktree` (`remove`); `keep` only if the task ended blocked/unfinished.
 10. **Summarize** — one short report: task id/title, route taken (INLINE/ORCHESTRATE), what shipped (commit SHA), findings applied vs left for the user, cleanup done.
 
