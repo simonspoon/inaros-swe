@@ -35,7 +35,7 @@ Spec lives in mesa as a task, not a file. Steps:
    mesa task create --project <P> --title "Spec: <feature>" --tags spec \
      --description "<full spec body: Problem / Goal / Requirements (must|should|won't) / Constraints / Assumptions>"
    ```
-   Capture the spec task id.
+   Capture the spec task id. Work originates from an existing mesa task (`task next` picked it) instead → reuse it as the spec parent (update its description to the spec body, add `tag=spec`) — flip it `in_progress` immediately on pickup, before writing the spec body, don't wait for planner's later umbrella flip. Don't create a duplicate spec task beside it.
 3. Cache pointers: write `.scratch/mesa.json` = `{"project":<P>,"spec":<spec-id>}` (git-excluded; lets planner/architect/engineer skip re-search). Recoverable — project by name, spec by `tag=spec`.
 
 One spec task per feature; reuse the repo's project, don't duplicate. Handoff pointer = spec task id (in `.scratch/mesa.json`), not a file path. mesa CLI details → `mesa` skill (`${CLAUDE_PLUGIN_ROOT}/skills/mesa/`).
