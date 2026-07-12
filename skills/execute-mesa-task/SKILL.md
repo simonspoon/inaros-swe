@@ -23,7 +23,7 @@ Glue skill: chains task-pickup → refine → ship → retro → cleanup into on
    - (e) tool change request → `mesa inbox add`.
    - (b) config / permission / hook change → never auto-apply, even here — `retrospective`'s hard rule survives this override. Print the command for the user.
    No cited moment, or genuinely speculative → leave in the report, don't apply.
-9. **Cleanup** — remove this run's temp files; if a worktree was created for the task, `ExitWorktree` (`remove` once merged to main and nothing left uncommitted; `keep` only if the task ended blocked/unfinished).
+9. **Cleanup** — remove this run's temp files; if a worktree was created for the task, verify the commit landed on `main` FIRST (`git log --oneline main..<worktree-branch>` empty, or `git log -1 main` shows the SHA) — the worktree branch is the only copy of the commit until merged, and `ExitWorktree`/`git branch -d` deletes it irreversibly. Only then `ExitWorktree` (`remove`); `keep` only if the task ended blocked/unfinished.
 10. **Summarize** — one short report: task id/title, route taken (INLINE/ORCHESTRATE), what shipped (commit SHA), findings applied vs left for the user, cleanup done.
 
 ## Notes
