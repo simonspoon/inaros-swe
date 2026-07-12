@@ -47,7 +47,7 @@ Most requests = small + clear. Don't tax them.
 
 ## Handoff
 
-- **INLINE** → proceed; create a mesa task for tracking purposes / the work runs against the crystallized Goal.
+- **INLINE** → proceed; create a mesa task for tracking purposes / the work runs against the crystallized Goal. INLINE = still engineering work, just no dispatched agent — no engineer.md safety net either. Carry its discipline yourself: blast-radius grep (who else calls what you're changing) before editing, advisor before Done, drive the UI before declaring a UI change complete.
 - **ORCHESTRATE** → write crystallized Problem / Knowledge / Goal to `.scratch/refine.md`. Confirm the one-line Problem + Goal with the user once before fan-out (the pipeline is the expensive, hard-to-reverse step) — skip the confirm only if the user already signaled to drive ("proceed" / "you know what you're doing"). Then invoke the `orchestrate` skill; product-owner loads `.scratch/refine.md` and builds the spec from it — no second interview.
 
 Scratch layout, depth budget, pointer-return → `orchestrate` skill (`${CLAUDE_PLUGIN_ROOT}/skills/orchestrate/SKILL.md`).
