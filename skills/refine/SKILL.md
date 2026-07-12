@@ -10,7 +10,7 @@ Front door. Runs before work on a non-trivial request. Capture intent → resolv
 ## Proportionality gate — read first
 
 Most requests = small + clear. Don't tax them.
-- Raw request passes the inline ALL-of test (CLAUDE.md §Orchestration — the *plugin's* CLAUDE.md, `${CLAUDE_PLUGIN_ROOT}/CLAUDE.md`, not the working repo's) AND no genuine intent fork → emit one-line restate, proceed inline. Skip the rest.
+- Raw request passes the inline ALL-of test (CLAUDE.md §Orchestration — the *plugin's* CLAUDE.md, `${CLAUDE_PLUGIN_ROOT}/CLAUDE.md`, not the working repo's) AND no genuine intent fork → emit one-line restate, proceed inline. Skip the rest — except: a bug-fix task touching SWE / AI-harness topics still gets one cheap KB grep (`inaros-kb:kb-lookup` or `~/inaros/knowledge/index.md`) for the task's own keywords before investigation starts. Prior art there can hand you the root cause and fix directly — cheaper than re-deriving it. Not a full Pass, just this one check.
 - Else → run the full Pass below.
 - Heavy resolution (multi-file trace, broad survey) → fan to a subagent, carry back only the crystallized output, not the transcript.
 - "Nothing to refine" = valid outcome. Don't manufacture unknowns to justify the skill.
@@ -21,7 +21,7 @@ Most requests = small + clear. Don't tax them.
 
 2. **List unknowns** — only what's *missing*, never a "what I already know" dump (a pre-read knowledge list is the model's prior narrating confidence, not fact). Classify each:
    - **intent-gap** — two readings → different outcomes a test could tell apart → ask user.
-   - **mechanics-gap** — how the system works → investigate, never ask.
+   - **mechanics-gap** — how the system works → investigate, never ask. This includes factual claims embedded in the request itself ("there's no mechanism for X", "X doesn't exist") — treat those as unverified until checked (grep/git log/read the code), not as accepted premises. A request framed as "should we do A or B" can dissolve entirely if the thing it assumes missing already exists.
    - **external-fact** — needs outside knowledge → flag for research, don't fetch here.
 
 3. **Resolve blocking unknowns.** Blocking = resolution changes the **Goal** line or the **route**; else note it, move on (don't loop on non-blocking detail).
