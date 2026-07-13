@@ -6,7 +6,7 @@ A [Claude Code](https://docs.claude.com/en/docs/claude-code/overview) plugin: an
 
 ## What's inside
 
-- **10 skills** — invocable workflows (orchestration, evals, expert consults, QA drivers, retrospectives).
+- **11 skills** — invocable workflows (orchestration, evals, expert consults, QA drivers, retrospectives).
 - **8 agents** — specialized subagents the skills and the main loop dispatch to.
 - **1 hook** — a code-review gate (Stop gate + PostToolUse review marker).
 - **[`CLAUDE.md`](CLAUDE.md)** — the operating principles all of the above follow.
@@ -35,6 +35,7 @@ To develop locally instead, clone the repo and add it as a local marketplace:
 | [`refine`](skills/refine) | Front door: restate intent → resolve unknowns → crystallize → route the task inline vs. to the pipeline. | — |
 | [`orchestrate`](skills/orchestrate) | How to drive the product-owner → planner → architect → engineer pipeline at scale (handoff, depth budget, context discipline). | `mesa` |
 | [`mesa`](skills/mesa) | Drive the `mesa` CLI: local-first projects, tasks with dependencies, storyboards, and a per-project bulletin board. | `mesa` |
+| [`execute-mesa-task`](skills/execute-mesa-task) | Chain a mesa task end-to-end: pick up → refine → work → update docs → commit to main → retrospective → cleanup. | `mesa` |
 | [`consult-ai-experts`](skills/consult-ai-experts) | Critique a skill/agent/prompt idea with a panel of 5 AI-expert personas running as parallel subagents. | — |
 | [`improve-skill`](skills/improve-skill) | Eval-driven loop that improves one skill/agent: draft test cases → run via subagents → LLM-judge → smallest fix → re-test. Optional multi-model sweep. | — |
 | [`retrospective`](skills/retrospective) | End-of-session review that mines the session for skill fixes, tool/config requests, and facts worth keeping. | — |
@@ -74,7 +75,7 @@ The plugin is built around a few principles, spelled out in [`CLAUDE.md`](CLAUDE
 - **[Claude Code](https://docs.claude.com/en/docs/claude-code/overview)** — a recent version with plugin support.
 - **bash + git** — for the Stop hook. `jq` and the `mesa` CLI are optional; without them the hook simply skips its orchestration-aware checks.
 - **Companion CLIs**, only for the skills that name them above:
-  - [`mesa`](skills/mesa) (used by `mesa` and `orchestrate`), `khora`, `loki`, and `qorvex` — separate command-line tools that must be installed and on your `PATH`.
+  - [`mesa`](skills/mesa) (used by `mesa`, `orchestrate`, and `execute-mesa-task`), `khora`, `loki`, and `qorvex` — separate command-line tools that must be installed and on your `PATH`.
   - `Uriel.Profiler` — a NuGet package added to the .NET MAUI app under test.
 
   These companion tools are not included in this repo. The skills that don't list a dependency (`refine`, `orchestrate`'s guidance, `consult-ai-experts`, `improve-skill`, `retrospective`) work with Claude Code alone.
