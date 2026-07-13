@@ -96,6 +96,7 @@ Multi-step task → write plan with a check per step, then execute:
 - Splits into ≥3 independently-verifiable units of work. → needs planner.
 - ≥2 functional areas touched, OR a cross-area interface/contract in question. → needs architect.
   - **Functional area = one distinct behavioral surface with its own verification** (a single skill, agent, hook, or module) — NOT the repo/plugin as a whole. **Count the surfaces the diff edits; don't narrate scope down**: 4 agents + 2 skills = 6 surfaces = ≥2 areas, even if all "inaros-swe wiring." Collapsing many files to "one area" by naming the umbrella is the drift tell.
+  - The opposite drift: don't count files touched as areas either. A file split with no independent verification is plumbing for ONE surface, not one area apiece — e.g. a CLI flag added in one file that only gates behavior implemented in another file is ONE area (test them together as the one feature), not two. Ask "does this half have a verification a test could fail on its own?" — no → it's plumbing, fold it into the surface it serves.
 - Won't fit one inline pass without losing the thread.
 
 Inline (skip the pipeline) ONLY when ALL hold: one functional area, one understood change, no decomposition, intent clear.
