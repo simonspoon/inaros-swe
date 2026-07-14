@@ -7,7 +7,7 @@ Unit of work in exactly one project (immutable after creation). Two graphs: subt
 | Command | Purpose |
 |---|---|
 | `mesa task create --project <P> --title <TITLE> [opts]` | Create; prints full task. |
-| `mesa task list [filters]` | Compact array — omits `description`, `acceptance`, `artifact`, timestamps. Filters AND together. Verify `artifact`/`acceptance` with `task show`, NOT `list` (a set field reads as absent/null here). |
+| `mesa task list [filters]` | Compact array — omits `description`, `acceptance`, `artifact`, `result`, timestamps. Filters AND together. Verify `artifact`/`acceptance`/`result` with `task show`, NOT `list` (a set field reads as absent/null here). |
 | `mesa task next [--project <P>]` | Next actionable (todo + unblocked), full object. |
 | `mesa task show <ID>` | Full object incl. description. |
 | `mesa task update <ID> <flags>` | Change passed fields only; ≥1 required. |
@@ -22,15 +22,16 @@ Unit of work in exactly one project (immutable after creation). Two graphs: subt
 
 `--description <D>` · `--priority low|medium|high` (default medium) · `--tags a,b,c` · `--parent <ID>` (subtask; same project required) · `--acceptance <text>` (definition-of-done) · `--artifact <text>` (work receipt: commit SHA / PR URL / path).
 
-update adds: `--title` · `--status todo|in_progress|done|cancelled` · `--no-parent` (detach).
+update adds: `--title` · `--status todo|in_progress|done|cancelled` · `--no-parent` (detach) · `--result <text>` (final-summary prose, **update-only** — a task can't have a completion summary at creation).
 
 - update changes only passed flags, ≥1 required. Project is immutable.
-- `--description ""` / `--acceptance ""` / `--artifact ""` clear those fields.
+- `--description ""` / `--acceptance ""` / `--artifact ""` / `--result ""` clear those fields.
 - `--tags` **REPLACES** the full tag set; `--tags ""` clears all tags. Not additive.
+- `result` vs `artifact`: `artifact` is a pointer (commit SHA / PR URL / path); `result` holds the narrative itself — write the actual final summary there, e.g. `mesa task update <id> --status done --artifact <sha> --result "<summary>"`.
 
-### Long text from a file (`--description-file` / `--acceptance-file`)
+### Long text from a file (`--description-file` / `--acceptance-file` / `--result-file`)
 
-On create AND update: `--description-file <path>` / `--acceptance-file <path>` read the field from a file (`-` = **stdin**) instead of an inline arg — content is read **verbatim**, so multi-line text with shell metacharacters (backticks, `$()`, `<>`) round-trips byte-for-byte. **This is the fix for the shell-mangling gotcha below** — prefer it over Python-subprocess for long/structured bodies.
+On create AND update: `--description-file <path>` / `--acceptance-file <path>` read the field from a file (`-` = **stdin**) instead of an inline arg — content is read **verbatim**, so multi-line text with shell metacharacters (backticks, `$()`, `<>`) round-trips byte-for-byte. **This is the fix for the shell-mangling gotcha below** — prefer it over Python-subprocess for long/structured bodies. `--result-file` is the same mechanism, **update-only**, and is the natural way to pipe a multi-paragraph summary in: `... | mesa task update <id> --result-file -`.
 
 - Each `*-file` flag **conflicts** with its inline twin (`--description` vs `--description-file`) → usage error, exit 2.
 - Only **one** field may read `-` (stdin) per invocation → two `-` is exit 2.

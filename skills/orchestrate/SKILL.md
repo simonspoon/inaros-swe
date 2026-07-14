@@ -11,13 +11,13 @@ Pipeline agents carry the `Skill` tool — invoke skills directly (this `orchest
 
 ## Mesa backbone
 
-Dependency graph + status live in **mesa**, not files — so an agent queries the next-actionable story (`task next`) instead of holding or traversing the DAG in context. That server-side graph resolution is mesa's specific win; pointers-not-payloads (below) is store-agnostic — credit it there, not here. `.scratch/` holds only arch docs + engineer results. mesa CLI details → `mesa` skill (`${CLAUDE_PLUGIN_ROOT}/skills/mesa/`).
+Dependency graph + status live in **mesa**, not files — so an agent queries the next-actionable story (`task next`) instead of holding or traversing the DAG in context. That server-side graph resolution is mesa's specific win; pointers-not-payloads (below) is store-agnostic — credit it there, not here. `.scratch/` holds only arch docs — engineer results are durable in mesa's own `result` field (`mesa task update --result`), not scratch: `.scratch/` is git-excluded and gets cleaned up, so long-lived narrative content never belongs there. mesa CLI details → `mesa` skill (`${CLAUDE_PLUGIN_ROOT}/skills/mesa/`).
 
 - **Project** = the repo. Resolve: `mesa project list` → match `name` == repo basename (`basename "$(git rev-parse --show-toplevel)"`); none → `mesa project create "<basename>"`. PO does this at entry, caches `{project,spec}` in `.scratch/mesa.json`. **Worktree caveat:** inside a git worktree `--show-toplevel` = the worktree dir → basename mis-resolves (worktree name ≠ repo name). Use `basename "$(dirname "$(git rev-parse --git-common-dir)")"` there — or dispatcher pins the known project id in the PO prompt and PO skips resolution.
 - **Spec** = one parent task (`tag=spec`, description = spec body). Work that *originates from an existing mesa task* (e.g. `task next` picked it) → reuse that task as the spec parent (update its description to the spec body, add `tag=spec`) — don't create a duplicate spec task beside it. **Stories** = child tasks (`--parent`), `--acceptance` = verify check, `block` edges = deps. **Epics** (large) = intermediate parent tasks (`tag=epic`).
 - **Umbrella tasks** (spec, epics) set `in_progress` once children exist → excluded from `task next`, which then returns only leaf stories.
 - **Work loop**: `mesa task next --project <P>` = next actionable (todo + unblocked) story → dispatch engineer. `mesa task list --project <P> --status todo --unblocked` = the concurrent batch. `.next == null` + counts (`{blocked,in_progress,todo}`) = done vs in-flight vs stuck.
-- **Status = source of truth** in mesa. Engineer flips `in_progress` → `done` + `--artifact "<X>"` (`<X>` = the `result.md` path, else the commit SHA — one value). No ledger.
+- **Status = source of truth** in mesa. Engineer flips `in_progress` → `done` + writes the full narrative straight into `--result` (plus `--artifact "<sha>"` only when there's a commit/PR to point at). No ledger.
 - **Agents never run `mesa serve` or `mesa delete`.** `serve` opens an outbound HTTP surface (exfil leg); `delete` cascades the whole subtree unconfirmed (wipes the backbone). Both human-operated, out-of-band.
 - **Trust the cached project id, not the name.** Resolve by basename once (PO / recovery); thereafter read the `project` id from `.scratch/mesa.json`. Basename match is first-resolve only — two repos sharing a basename collide into one project.
 - **`.scratch` doesn't exist in a fresh worktree.** It's git-excluded, so `EnterWorktree` (required before a background session's first edit) lands in a checkout with no `.scratch` at all — a `Write` there fails until the dir exists. `mkdir -p .scratch` and copy `mesa.json` (and any in-scope `arch.md`) over from the main checkout first, so the `{project,spec}` pointer and prior arch decisions carry into the isolated session instead of being silently lost.
@@ -53,7 +53,7 @@ Rules:
 
 Single biggest lever against context blowup. Heavy work isolated in the subagent's own window; the orchestrator must not re-accumulate it.
 
-- Worker writes full result to its artifact file.
+- Worker writes full result into its mesa task's `result` field (`--result-file -`), not a scratch file.
 - Worker **returns one status line**, not the payload:
 
 ```
@@ -64,12 +64,12 @@ e.g.  04 pass
       11 conflict: story 11 vs arch doc §3
 ```
 
-- Orchestrator drops detail; status lands in mesa (task status + `--artifact` pointer). Holds N one-liners, never N blobs.
-- Conclusions that affect a downstream artifact → parent writes them into the artifact before its own Done. Return value is disposable; the file (or mesa task) is the handoff.
+- Orchestrator drops detail; status lands in mesa (task status + `result` field). Holds N one-liners, never N blobs.
+- Conclusions that affect downstream work → parent writes them into its mesa task's `result` field before its own Done. Return value is disposable; the mesa task is the handoff.
 
 ## Scratch layout
 
-Specs + status in mesa. `.scratch/` holds the rest, git-excluded. State = mesa + disk; context = working set.
+Specs + status + engineer results all in mesa. `.scratch/` holds only arch docs, git-excluded. State = mesa + disk; context = working set.
 
 ```
 .scratch/
@@ -79,19 +79,16 @@ Specs + status in mesa. `.scratch/` holds the rest, git-excluded. State = mesa +
   epics/
     01-<slug>/
       arch.md               architect: epic-local design (else ../arch.md)
-      stories/
-        <story-task-id>/
-          result.md         engineer: full result
 ```
 
-Story dirs key off the mesa story task id. Small task → flatten: `.scratch/{mesa.json, arch.md, stories/<id>/result.md}`, no `epics/`.
+No per-story directory — an engineer's full result lives in its own story task's mesa `result` field (`mesa task update <story-id> --result-file -`), not a scratch file. Small task → flatten: `.scratch/{mesa.json, arch.md}`, no `epics/`.
 
 ## Status = mesa (no ledger)
 
 mesa task status is the source of truth; survives compaction (re-query, don't hold).
-- Engineer: `in_progress` on start → `done` + `--artifact "<X>"` on pass (`<X>` = `result.md` path, else commit SHA — one value). `--artifact` is the pointer to the full result.
+- Engineer: `in_progress` on start → `done` + `--result-file -` (full narrative, piped) on pass, plus `--artifact "<sha>"` only when there's a commit/PR to point at. `result` **is** the full result, not a pointer to one.
 - Orchestrator: read state via `mesa task list/next --project <P>`; never hold the task list in context as the database — it's in mesa.
-- blocked/conflict → engineer reverts the story to `todo` with `--artifact` pointing at its `result.md` (no `blocked` status exists — `blocked` is edge-derived, not settable) and writes the blocker reason into that `result.md`; a reverted story is thus a `todo` carrying an artifact pointer that survives compaction — orchestrator reads it before re-dispatching, then re-dispatches or escalates.
+- blocked/conflict → engineer reverts the story to `todo`, writing the blocker reason directly into `--result` (no `blocked` status exists — `blocked` is edge-derived, not settable); a reverted story is thus a `todo` carrying its blocker reason in `result` that survives compaction — orchestrator reads it before re-dispatching, then re-dispatches or escalates.
 
 ## Big-task flow
 
@@ -102,14 +99,14 @@ Run carries through all steps in one go. refine's intent confirm (at the front d
 2. **Planner** reads spec (`mesa task show <spec-id>`). Large spec → epic parent tasks first, then **fan out per-epic planners** (depth 1) — each creates only its epic's story tasks. Avoids one planner overflowing on 100 stories. Small spec → single planner, flat story list under the spec. Sets umbrella tasks (spec, epics) `in_progress`. **Two umbrella rules the dispatch loop depends on:** (a) any TODO/parent that gains child stories MUST be flipped `in_progress` too — else `task next`/`--unblocked` returns both the parent and its leaf, dispatching the same work twice; (b) point cross-story block edges at the concrete **foundation child story**, not the umbrella (`block <dep-story> --by <foundation-story>`, not `--by <umbrella>`) — so lanes coordinate purely on leaf `done` with no umbrella-close handshake.
 3. **Architect** → contracts/ADRs. Cross-cutting → `.scratch/arch.md`; epic-local → `epics/NN/arch.md`. (flat; may fan out for codebase mapping)
 4. **Dispatch** — driven by `mesa task next --project <P>` (leaf stories only):
-   - Each engineer flips its story `in_progress` → `done` + `--artifact`, writes full result to `result.md`, returns **one status line** (`<id> <status> [note]`, status ∈ pass | blocked | conflict) — never the payload.
+   - Each engineer flips its story `in_progress` → `done` + writes the full result into `--result` (plus `--artifact` if there's a commit SHA), returns **one status line** (`<id> <status> [note]`, status ∈ pass | blocked | conflict) — never the payload.
    - Small → main fans engineers across the unblocked batch (`task list --status todo --unblocked`, one message/multiple calls); status lands in mesa.
    - Large → main fans **one `orchestrator` agent per epic** (depth 1, the epic-orch role); each drives `task next` over its epic's stories, fans engineers (depth 2), returns one epic status line to main. Closes the epic umbrella task (`--status done`) once its stories all `done`.
 5. Order by dependency (block edges); independent units (unblocked) run concurrent.
 
 ## Parallel writes
 
-Concurrent engineers touching the same source → **worktree-isolate** (`isolation: worktree`). Per-story `result.md` paths never collide; source files can. Isolate only when concurrent writers overlap — it costs setup + disk.
+Concurrent engineers touching the same source → **worktree-isolate** (`isolation: worktree`). Each story's result lives in its own mesa row — never collides; source files can. Isolate only when concurrent writers overlap — it costs setup + disk.
 
 **Expensive shared build (e.g. a 10–40 min OCCT/native compile)?** Worktree-per-agent multiplies that build — avoid it. Instead split work into **lanes by disjoint directory** (e.g. Rust kernel `cad-*` vs frontend `app/src/*`) that run concurrent on ONE tree, each lane **serial internally** on its hot files. Front-load the story that unifies the build (shared target dir) so every later build pays the native compile once.
 
@@ -126,4 +123,4 @@ Cap ~ min(16, cores−2) concurrent per orchestrator; excess queues. Dispatch as
 
 ## Recovery / compaction
 
-State lives in mesa (+ `.scratch/` for arch/results). After compaction or restart: re-read `.scratch/mesa.json` (missing → re-resolve project by repo basename, spec by `tag=spec`; >1 match on either → STOP, surface to the user/main, don't guess — resuming against the wrong project corrupts state), then `mesa task next --project <P>` / `task list` to resume from the first actionable story. Never hold the task list in context as the database — it's in mesa.
+State lives in mesa (task status + `result` field) plus `.scratch/` for arch docs only. After compaction or restart: re-read `.scratch/mesa.json` (missing → re-resolve project by repo basename, spec by `tag=spec`; >1 match on either → STOP, surface to the user/main, don't guess — resuming against the wrong project corrupts state), then `mesa task next --project <P>` / `task list` to resume from the first actionable story. Never hold the task list in context as the database — it's in mesa.

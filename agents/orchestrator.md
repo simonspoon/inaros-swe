@@ -20,10 +20,10 @@ Read first: `orchestrate` skill (`${CLAUDE_PLUGIN_ROOT}/skills/orchestrate/SKILL
 - `mesa task next --project <P>` scoped to this epic's stories = next actionable (todo + unblocked) → dispatch an **engineer** (depth 2) per story.
 - `mesa task list --project <P> --status todo --unblocked` (this epic) = the concurrent batch. Fan engineers in one message/multiple calls. Cap ~ min(16, cores−2); excess queues. Pipeline (drain each result as it lands) over barrier.
 - Order by dependency (block edges); unblocked units run concurrent.
-- Concurrent engineers overlapping source files → dispatch with `isolation: worktree`. Per-story `result.md` paths never collide; source does.
+- Concurrent engineers overlapping source files → dispatch with `isolation: worktree`. Each story's result lives in its own mesa row (the `result` field) — never collides; source files do.
 
 ## Status — mesa is source of truth
-- Engineer flips its story `in_progress` → `done` + `--artifact "<result.md | SHA>"`, returns one status line. You hold N one-liners, never N blobs — re-query mesa, don't hold the task list as the database.
+- Engineer flips its story `in_progress` → `done` + writes the full narrative into `--result` (+ `--artifact "<SHA>"` if there's a commit), returns one status line. You hold N one-liners, never N blobs — re-query mesa, don't hold the task list as the database.
 - `.next == null` + all stories `done` → close the epic umbrella: `mesa task update <epic-id> --status done`.
 - blocked/conflict story → re-dispatch if mechanical; else leave not-done, carry the note up.
 - Status ambiguous or stuck (stories not converging, blocked/conflict repeating) → call `advisor` before deciding re-dispatch vs. escalate.
