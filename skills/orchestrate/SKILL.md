@@ -102,6 +102,7 @@ Run carries through all steps in one go. refine's intent confirm (at the front d
    - Each engineer flips its story `in_progress` → `done` + writes the full result into `--result` (plus `--artifact` if there's a commit SHA), returns **one status line** (`<id> <status> [note]`, status ∈ pass | blocked | conflict) — never the payload.
    - Small → main fans engineers across the unblocked batch (`task list --status todo --unblocked`, one message/multiple calls); status lands in mesa.
    - Large → main fans **one `orchestrator` agent per epic** (depth 1, the epic-orch role); each drives `task next` over its epic's stories, fans engineers (depth 2), returns one epic status line to main. Closes the epic umbrella task (`--status done`) once its stories all `done`.
+   - An engineer that terminates early on a transient API error ("terminated early due to an API error" / "response stalled mid-stream") is not a `blocked`/`conflict` verdict — check the story's mesa status first (still not `done`, no commit yet): if so, resume the same agent via `SendMessage` to its returned `agentId` rather than re-dispatching a fresh one, which would duplicate work already done and lose its context.
 5. Order by dependency (block edges); independent units (unblocked) run concurrent.
 
 ## Parallel writes
