@@ -18,7 +18,7 @@ Glue skill: chains task-pickup → refine → ship → retro → cleanup into on
 7. **Complete** — `mesa task update <id> --status done --artifact <value> --result-file -` piping the step-11 summary on stdin (or `--result "<text>"` inline for a short one), so the durable narrative lives on the task itself, not a scratch file (`<value>` = commit SHA/path pointer — `--artifact` stays a pointer, `--result` carries the prose). There is no `mesa task done` subcommand.
 8. **Retrospective (report only)** — invoke `retrospective` skill against this session (task 1–7 + this skill's own run), but stop it at its Step 4 report — **this skill's own step 9 replaces retrospective's Step 5**, don't let the invocation reach retrospective's "wait for user approval" gate. Tell the invocation explicitly it's producing findings for an automated caller, not for a human to approve.
 9. **Auto-apply high-confidence findings** — the one place this skill overrides `retrospective`'s default report-only gate, per this workflow's explicit charter. Do this yourself; never surface `AskUserQuestion` for a finding. High-confidence = cites a concrete moment from this run AND has a low-blast-radius owner:
-   - (a) skill wording fix → edit the named `SKILL.md` directly.
+   - (a) skill wording fix → edit the named `SKILL.md` directly, then commit that edit in its plugin repo — an applied-but-uncommitted skill fix is indistinguishable from unapplied and can linger as stray dirty state.
    - (c) memory fact → write it (standard memory protocol).
    - (d) KB-worthy → run `/kb-capture`.
    - (e) tool change request → `mesa inbox add`.
