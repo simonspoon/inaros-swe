@@ -21,6 +21,7 @@ Glue skill: chains task-pickup → refine → ship → retro → cleanup into on
    - (a) skill wording fix → edit the named `SKILL.md` directly, then commit that edit in its plugin repo — an applied-but-uncommitted skill fix is indistinguishable from unapplied and can linger as stray dirty state.
    - (c) memory fact → write it (standard memory protocol).
    - (d) KB-worthy → run `/kb-capture`.
+   - (f) missed KB consult → run `inaros-kb:kb-lookup` retroactively for the named topic; fold any hit into the step-11 result narrative.
    - (e) tool change request → `mesa inbox add`.
    - (b) config / permission / hook change → never auto-apply, even here — `retrospective`'s hard rule survives this override. Print the command for the user.
    No cited moment, or genuinely speculative → leave in the report, don't apply.

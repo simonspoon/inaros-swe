@@ -1,6 +1,6 @@
 ---
 name: retrospective
-description: End-of-session review that mines THIS session for concrete improvements — skill fixes, tool change requests, config/permission recommendations, facts to remember, KB-worthy knowledge — and reports them for the user to act on. Use when the user invokes /retrospective or asks "what did we learn this session" / "any improvements from this session". Reports only; it does not apply changes unless the user approves a specific finding. Reviews the current session only; analyzing other/prior sessions is deferred to v2.
+description: End-of-session review that mines THIS session for concrete improvements — skill fixes, tool change requests, config/permission recommendations, facts to remember, KB-worthy knowledge, missed KB lookups — and reports them for the user to act on. Use when the user invokes /retrospective or asks "what did we learn this session" / "any improvements from this session". Reports only; it does not apply changes unless the user approves a specific finding. Reviews the current session only; analyzing other/prior sessions is deferred to v2.
 ---
 
 # Retrospective
@@ -36,13 +36,14 @@ Always emit a report with one Coverage line — even when recovery is blocked, r
 
 ## 2. Find candidate findings
 
-Scan session for concrete moments — a specific exchange, tool call, error, or correction — fitting one of five buckets. **Bucket (a) = primary deliverable; (b)–(e) secondary.** Five are exhaustive; fits none → drop it.
+Scan session for concrete moments — a specific exchange, tool call, error, or correction — fitting one of six buckets. **Bucket (a) = primary deliverable; (b)–(f) secondary.** Six are exhaustive; fits none → drop it.
 
 - **(a) Skill improvements** *(primary — nothing else watches for this)*: a skill that misfired, gave bad instructions, was missing, or should be created. Improvement = an edit to a `SKILL.md` under `${CLAUDE_PLUGIN_ROOT}/skills/`, or a new skill.
 - **(b) Config / permissions**: a permission prompt that recurred, a missing allowlist entry, or a hook that would've helped. Owner: `/fewer-permission-prompts` (repeated read-only prompts) or `/update-config` (hooks, specific permissions).
 - **(c) Things to remember**: a stable user preference, a correction the user made, or durable project state — meeting the memory bar. Owner: memory write protocol. Do NOT surface anything the repo, git history, or CLAUDE.md already records.
 - **(d) KB-worthy knowledge**: a durable, reusable technical fact (not session- or project-specific state). Owner: `/kb-capture`. Unsure (c) vs (d): user/project state → (c); reusable technical knowledge → (d).
 - **(e) Tool change requests**: a CLI tool / binary the session drove (mesa, nyx, khora, loki, cad, etc.) where a missing capability, bug, or rough edge cost the session — a fix/change/addition to the *tool itself* would've helped. NOT a `SKILL.md` edit (that's (a)) — the tool's own code, which this session can't touch. Owner: `mesa inbox add` (a change request the human routes to the tool's project later). Borderline (a) vs (e): the wrapping SKILL.md gave bad instructions → (a); the tool lacks the capability no instructions could supply → (e).
+- **(f) Missed KB consult**: session made a decision on a SWE / AI-harness topic (skill/agent/hook/prompt/eval/tooling design) without calling `inaros-kb:kb-lookup` first, where prior art plausibly existed. Owner: `inaros-kb:kb-lookup`, run retroactively on approval against the topic actually decided. Ground it in a concrete decision the session already made — usually the same moment behind an (a) or (d) candidate — not a generic "could have checked the KB."
 
 ## 3. Filter to what you can defend
 
@@ -52,6 +53,7 @@ Apply to every candidate; drop the ones that fail:
 - **For (a):** the skill you claim misfired must actually have run this session. Don't invent misfires.
 - **For (c) and (d): dedup.** The memory index (`MEMORY.md`) is already in context — drop a "remember" finding an existing memory already covers. For (d), note it may duplicate an existing KB page; flag for user rather than asserting it's new.
 - **For (e):** name the tool, the exact friction (what failed / was missing), and the concrete change requested. A vague "tool X is clunky" with no actionable ask → drop. Already-known limitation the session worked around cleanly = not a finding.
+- **For (f):** the session must have actually resolved a SWE/AI-harness question some other way (grep, memory, re-derivation, guessing) instead of checking the KB. Session already ran kb-lookup on that topic = not a finding. Every session that touches code is not automatically a finding — only ones with a real, named decision point.
 
 ## 4. Report
 
@@ -75,9 +77,12 @@ Coverage: full (live context) | backfilled via nyx | partial (<what was missing>
 
 ### (e) Tool change requests
 - <finding> — from: <moment>. Apply: run mesa inbox add --author retrospective "<tool>: <requested change>"
+
+### (f) Missed KB consult
+- <finding> — from: <moment>. Apply: run inaros-kb:kb-lookup for "<topic>" retroactively — may reveal missed prior art
 ```
 
-Write "none" under any empty bucket. All five empty → say so in one line, stop.
+Write "none" under any empty bucket. All six empty → say so in one line, stop.
 
 ## 5. Apply only on approval
 
@@ -88,6 +93,7 @@ Do nothing until user approves specific findings. When they do, apply each via i
 - **(d)** invoke `/kb-capture`.
 - **(e)** run `mesa inbox add --author retrospective "<tool>: <requested change>"` — one item per request; body names the tool + the concrete change. Lands unassigned; a human routes it later (don't `inbox assign` yourself).
 - **(b)** print the `/fewer-permission-prompts` or `/update-config` command for the user — **don't run it, don't edit `settings.json`, permissions, or hooks yourself.**
+- **(f)** invoke `inaros-kb:kb-lookup` for the named topic; fold any hit into the report, or offer it as a (d)/(c) finding if it's durable enough to keep.
 
 ## Anti-patterns
 
@@ -98,3 +104,4 @@ Do nothing until user approves specific findings. When they do, apply each via i
 - Filing a tool change request (e) for something a `SKILL.md` edit fixes — that's (a), not a tool bug. Or posting to mesa inbox before the user approves the finding.
 - Editing `settings.json`, permissions, or hooks — never this skill's job, even on approval.
 - Presenting a partial review as whole — context compacted → backfill via `nyx` (Step 1) instead of silently analyzing only the visible tail.
+- Flagging (f) on every session that touched code — only sessions with a real, named SWE/AI-harness decision point that skipped a KB check count.
