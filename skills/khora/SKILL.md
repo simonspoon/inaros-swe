@@ -46,6 +46,10 @@ Report each check PASS or FAIL with evidence, not "looks fine":
 
 ## Failure handling
 
+- Managed Codex exec: escalated `khora launch` may die when its shell call ends.
+  Immediate `session expired or Chrome process died` on the next command → run
+  launch → checks → kill in one escalated shell call; capture `S`, install an
+  `EXIT` trap that kills it, then execute the canonical sequence inline.
 - Navigation returns `ERR_CONNECTION_REFUSED` / page is Chrome's "This site can't be reached" interstitial = app unreachable, a precondition mismatch — not a slow page, not a wait-for exit 3 to retry. Input said the app is running but the URL didn't answer → report the verification BLOCKED, quoting the mismatch as evidence (e.g. "input: running at :3000; navigate returned ERR_CONNECTION_REFUSED"). Do NOT abstain silently, do NOT fabricate the opposite, do NOT start the server. Still `khora kill $S`.
 - `wait-for` / `wait-gone` exit 3 = element never reached that state within timeout — page in unexpected state, not necessarily slow. Screenshot + `khora console $S` to see why. Retry once with longer `--timeout` only if you can say why first timeout was too short (e.g. cold dev-server compile); else report FAIL with selector + timeout used.
 - Commands failing with dead/unknown session: `khora status` to check, then relaunch.
