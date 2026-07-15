@@ -10,7 +10,7 @@ Front door. Runs before work on a non-trivial request. Capture intent → resolv
 ## Proportionality gate — read first
 
 Most requests = small + clear. Don't tax them.
-- Raw request passes the inline ALL-of test (CLAUDE.md §Orchestration — the *plugin's* CLAUDE.md, `${CLAUDE_PLUGIN_ROOT}/CLAUDE.md`, not the working repo's) AND no genuine intent fork → emit one-line restate, proceed inline. Skip the rest — except: a bug-fix task touching SWE / AI-harness topics still gets one cheap KB grep (`inaros-kb:kb-lookup` or `~/inaros/knowledge/index.md`) for the task's own keywords before investigation starts. Prior art there can hand you the root cause and fix directly — cheaper than re-deriving it. Not a full Pass, just this one check.
+- Raw request passes the inline ALL-of test (CLAUDE.md §Orchestration — the *plugin's* CLAUDE.md, `${CLAUDE_PLUGIN_ROOT}/CLAUDE.md`, not the working repo's) AND no genuine intent fork → emit one-line restate, proceed inline. Skip the rest — except: a task touching SWE / AI-harness topics (bug fix or feature — don't gate on task shape) still gets one cheap KB grep (`inaros-kb:kb-lookup` or `~/inaros/knowledge/index.md`) for the task's own keywords before investigation starts. Prior art there can hand you the root cause and fix directly — cheaper than re-deriving it. Not a full Pass, just this one check.
 - Else → run the full Pass below.
 - Heavy resolution (multi-file trace, broad survey) → fan to a subagent, carry back only the crystallized output, not the transcript.
 - "Nothing to refine" = valid outcome. Don't manufacture unknowns to justify the skill.
