@@ -2,7 +2,7 @@
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Skill|ReportFindings",
+        "matcher": "Skill|ReportFindings|Agent",
         "hooks": [
           {
             "type": "command",

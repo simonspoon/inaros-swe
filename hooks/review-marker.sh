@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # inaros-swe PostToolUse hook — records that a code review ran this turn.
 #
-# Fires on ReportFindings (a review reported its findings) or Skill(code-review)
-# (a review was launched). Touches "$(git rev-parse --git-dir)/inaros-review-done";
+# Fires on ReportFindings (a review reported its findings), Skill(code-review)
+# (a review was launched), or Agent(inaros-swe:guru) (a guru consult was launched).
+# Touches "$(git rev-parse --git-dir)/inaros-review-done";
 # the Stop hook (stop-review-gate.sh) consumes the marker once and treats the diff
 # present at that stop — including fixes applied from the review's findings — as
 # reviewed. Inert outside a git repo or on unrelated tools.
@@ -21,6 +22,11 @@ case "$payload" in
   *'"tool_name":"Skill"'* | *'"tool_name": "Skill"'*)
     case "$payload" in
       *'"skill":"code-review"'* | *'"skill": "code-review"'*) ;;
+      *) exit 0 ;;
+    esac ;;
+  *'"tool_name":"Agent"'* | *'"tool_name": "Agent"'*)
+    case "$payload" in
+      *'"subagent_type":"inaros-swe:guru"'* | *'"subagent_type": "inaros-swe:guru"'*) ;;
       *) exit 0 ;;
     esac ;;
   *) exit 0 ;;

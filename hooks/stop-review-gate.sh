@@ -2,9 +2,10 @@
 # inaros-swe Stop hook — code-review gate.
 #
 # Blocks finishing a turn that would leave a NON-TRIVIAL, UNCOMMITTED, UNREVIEWED
-# diff, instructing the agent to run /code-review first. Honest scope of what this
-# enforces: it forces (at most) one review prompt per distinct diff state — it can't
-# verify the agent actually reviewed, only that it was told to before stopping.
+# diff, instructing the agent to consult the guru reviewer agent (or run
+# /code-review) first. Honest scope of what this enforces: it forces (at most) one
+# review prompt per distinct diff state — it can't verify the agent actually
+# reviewed, only that it was told to before stopping.
 #
 # Inert when: not a git repo, background work is in flight (see below), diff below
 # threshold, a review just ran (see review credit below), or this exact diff was
@@ -86,6 +87,6 @@ prev="$(cat "$state" 2>/dev/null || true)"
 printf '%s\n' "$cur" > "$state"
 
 # Block the stop (exit 2). stderr is fed back to the agent.
-printf 'Code-review gate: %s file(s) / %s changed line(s) vs HEAD are uncommitted and not yet reviewed this turn. Run /code-review on the current diff, address its findings, then finish. To skip, state an explicit reason.\n' \
+printf 'Review gate: %s file(s) / %s changed line(s) vs HEAD are uncommitted and not yet reviewed this turn. Consult guru (Agent tool, subagent_type "inaros-swe:guru"; pass ONLY the task/spec pointer, repo path, and diff base ref — never your plan or reasoning) or run /code-review. Address findings, then finish. To skip, state an explicit reason.\n' \
   "$files" "$lines" >&2
 exit 2
