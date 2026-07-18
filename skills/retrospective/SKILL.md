@@ -57,7 +57,9 @@ Apply to every candidate; drop the ones that fail:
 
 ## 4. Report
 
-Group findings by bucket. Each: the finding, the moment it came from, the owning skill/command to apply it. Shape:
+**Programmatic caller** (args name a non-human caller, e.g. execute-mesa-task step 8): skip the template below — do not render a title, Coverage line, or `###` section headers, none of that report shape. State findings as plain `bucket: finding — from: moment — apply: <owner>` bullets grouped by bucket, `none` for empty buckets. This list is data handed back to the caller, not a deliverable presented to a human — producing it is not a stopping point for you; continue in the same response into whatever the caller does next. (Root cause of a 3x-recurring stall, mesa tasks 401/402/415: the caller's own "don't stop" wording lives in *its* file, loaded earlier and less salient by the time you're mid-template here; the override has to sit next to the thing that actually triggers the stop — this section's polished report shape — not just at the consumption site.)
+
+**Standalone caller** (default — `/retrospective`, or no such args): group findings by bucket. Each: the finding, the moment it came from, the owning skill/command to apply it. Shape:
 
 ```
 ## Retrospective: <session in one line>
