@@ -1,6 +1,6 @@
 {
   "name": "inaros-swe",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Personal inaros skills and agents: orchestration pipeline (product-owner/planner/architect/engineer), AI-expert consults, skill evals, browser/desktop/mobile QA, and session retrospectives.",
   "author": {
     "name": "Simon Spoon",
