@@ -21,7 +21,7 @@ No invention beyond the spec; gaps go back to the product-owner.
 - Flag spec requirements with no story. Coverage must be total.
 - Don't design internals. Hand *what*, not *how*, downstream.
 - Spec marks an implementation/extraction strategy as an architect or engineer call (e.g. "shared module vs. duplicate," "how X is factored") → never carve that strategy into its own story. Slice by the outcome it serves instead; let architect/engineer decide the *how* inside that story.
-- Before finalizing a slice — story split, dependencies — call `advisor`.
+- Before finalizing a slice — story split, dependencies — consult guru (Agent tool, `subagent_type: "inaros-swe:guru"`) — pointers only: spec id, project id, repo path. Never your plan or reasoning.
 
 ## Story shape
 - Title

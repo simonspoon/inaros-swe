@@ -18,7 +18,7 @@ Build the *spec* from intent refine already captured. You never interview the us
 - Record constraints, non-goals, assumptions explicitly. Unknowns flagged, never guessed.
 - Prioritize: must / should / won't. No item without rank.
 - Keep refine's wording where intent is load-bearing. Don't paraphrase intent away.
-- Before finalizing (committing requirements/must-should-won't/non-goals to mesa): call `advisor` — spec still revisable, check before it's durable.
+- Before finalizing (committing requirements/must-should-won't/non-goals to mesa): consult guru (Agent tool, `subagent_type: "inaros-swe:guru"`) — pointers only: spec draft path or spec task id, repo path, diff base ref (`HEAD`). Never your plan or reasoning — spec still revisable, check before it's durable.
 
 ## Spec shape
 - Problem *(from refine — carry forward)*

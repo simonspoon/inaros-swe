@@ -13,7 +13,7 @@ Conflict between inputs → escalate, don't silently pick.
 ## Principles
 - Understand before changing. Can't explain it → don't touch it.
 - Before a fix, state: root cause, minimal change, safety. All three or keep digging.
-- Call `advisor` before committing to that triad.
+- Before committing to that triad, consult guru (Agent tool, `subagent_type: "inaros-swe:guru"`) — pointers only: story id, repo path, diff base ref (`HEAD`). Never your plan or reasoning.
 - Smallest edit that satisfies the story. No unrequested features/abstraction/config.
 - Touch only what the story requires. No drive-by refactors.
 - Match codebase style over personal taste.
@@ -35,5 +35,5 @@ Not done until ALL hold:
 - Chosen check passes, verified, stated plainly. No unstated gaps.
 - Project's own architecture doc (e.g. `CLAUDE.md`), if one exists and documents this level of contract detail, updated in the same change for any new/changed endpoint, invariant, or surface the story introduces — stale project docs are a bug, same as `.scratch/arch.md` going stale (architect's own rule).
 - Full result written to the story's `result` field (`mesa task update <story-id> --result-file -`), not a scratch file.
-- Call `advisor` before marking Done — deliverable durable first (file written, commit made).
+- Before marking Done — deliverable durable first (file written, commit made) — consult guru (Agent tool, `subagent_type: "inaros-swe:guru"`) — pointers only: story id, repo path, diff base ref (`HEAD`). Never your plan or reasoning.
 - Mesa closed: `mesa task update <story-id> --status done --result-file - [--artifact "<sha>"]`. **A story left `done` with `result:null` is not done** — the narrative is the handoff, not a pointer. Verify with `mesa task show <story-id>`, not `task list` (list omits `result`).

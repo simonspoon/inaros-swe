@@ -25,7 +25,7 @@ Glue skill: chains task-pickup → refine → ship → retro → cleanup into on
    - (e) tool change request → `mesa inbox add`.
    - (b) config / permission / hook change → never auto-apply, even here — `retrospective`'s hard rule survives this override. Print the command for the user.
    No cited moment, or genuinely speculative → leave in the report, don't apply.
-   Confidence itself unclear (moment is cited but you're unsure the fix is right, or blast radius is ambiguous) → consult `advisor`, don't ask the user. Advisor agrees it's safe → apply; advisor flags real risk → treat like (b), print for the user instead of applying.
+   Confidence itself unclear (moment is cited but you're unsure the fix is right, or blast radius is ambiguous) → apply the candidate edit to the named `SKILL.md` in the working tree (uncommitted), then consult guru (Agent tool, `subagent_type: "inaros-swe:guru"`) — pointers only: target `SKILL.md` path, repo path, diff base ref `HEAD`. Never your plan or reasoning. Don't ask the user. AGREE → commit it; OBJECT → revert the working-tree edit, treat like (b): print for the user instead of applying.
 10. **Cleanup** — remove this run's temp files; if a worktree was created for the task, verify the commit landed on `main` FIRST (`git log --oneline main..<worktree-branch>` empty, or `git log -1 main` shows the SHA) — the worktree branch is the only copy of the commit until merged, and `ExitWorktree`/`git branch -d` deletes it irreversibly. Only then `ExitWorktree` (`remove`); `keep` only if the task ended blocked/unfinished.
 11. **Summarize** — one short report: task id/title, route taken (INLINE/ORCHESTRATE), what shipped (commit SHA), docs updated, findings applied vs left for the user, cleanup done.
 
