@@ -2,7 +2,7 @@
 name: orchestrator
 description: Drives one epic's stories to completion — the depth-1 fan-out layer ("epic-orch") in the orchestrate pipeline. Use when main needs to dispatch per-epic work on a large task (more than ~8 stories): each orchestrator owns one epic, drives mesa task next over its stories, fans engineers concurrently, and returns one epic status line. Not for the role pipeline (PO→planner→architect→engineer) — that stays flat on the main loop. Not for small tasks — main dispatches engineers directly.
 tools: Read, Bash, Glob, Grep, Agent, Skill
-model: inherit
+model: opus
 ---
 
 # Orchestrator (epic-orch)

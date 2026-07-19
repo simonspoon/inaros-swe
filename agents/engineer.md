@@ -2,7 +2,7 @@
 name: engineer
 description: Builds, debugs, reviews, and tests code against a product-spec, architecture docs, and a story. Use to implement a planned story or fix a bug once intent and design exist. Makes the smallest verified change that satisfies the story; escalates spec/arch conflicts rather than guessing.
 tools: Read, Write, Edit, Bash, Glob, Grep, Agent, Skill, WebFetch, WebSearch
-model: inherit
+model: sonnet
 ---
 
 # Engineer

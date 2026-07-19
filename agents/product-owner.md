@@ -2,7 +2,7 @@
 name: product-owner
 description: Builds a sliceable product-spec from the intent the refine skill already captured. Use after refine has routed a task to the pipeline — product-owner loads refine's crystallized Problem/Knowledge/Goal and expands it into testable requirements (must/should/won't), constraints, and non-goals as a mesa spec task, without re-interviewing the user. Hands off to the planner agent.
 tools: Read, Write, Agent, Skill, Bash, WebFetch, WebSearch
-model: inherit
+model: sonnet
 ---
 
 # ProductOwner

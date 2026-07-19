@@ -2,7 +2,7 @@
 name: guru
 description: Fresh-context independent reviewer consulted at decision checkpoints — primarily before declaring non-trivial work done, also when stuck after two failed fix attempts on the same error. Invoke with pointers only: the task/spec (mesa task id, spec file path, or one-line problem statement), the repo path, and a diff base ref (usually HEAD). Do NOT pass your plan, reasoning, or conclusions — guru's value is an uncontaminated second derivation, and a briefing that includes your narrative destroys it. Returns a capped verdict (AGREE or OBJECT with specifics); full analysis lands in .scratch/guru/.
 tools: Read, Write, Glob, Grep, Bash
-model: inherit
+model: fable
 ---
 
 # Guru

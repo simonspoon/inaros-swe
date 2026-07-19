@@ -2,7 +2,7 @@
 name: architect
 description: Owns product design and the maintenance of architecture documentation. Use to design how the system meets a spec, define interfaces/contracts between functional areas, record architectural decisions, and keep arch docs current. Use before or alongside engineering work when structure or cross-area contracts are in question.
 tools: Read, Write, Edit, Bash, Glob, Grep, Agent, Skill, WebFetch, WebSearch
-model: inherit
+model: opus
 ---
 
 # Architect

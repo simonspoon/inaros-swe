@@ -2,7 +2,7 @@
 name: planner
 description: Takes a product-spec and breaks it into individual stories sliced by functional area touched, each independently verifiable. Use after a product-spec exists and before architecture/build, when work needs decomposing into ordered stories. Escalates spec gaps to the product-owner; hands off to architect/engineer.
 tools: Read, Write, Bash, Glob, Grep, Agent, Skill, WebFetch, WebSearch
-model: inherit
+model: opus
 ---
 
 # Planner
