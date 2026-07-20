@@ -10,7 +10,7 @@ Single binary `mesa`. Four command groups: `project`, `task`, `storyboard`, `inb
 ## Model
 
 - **Project** = top container. Owns tasks and storyboards. Delete cascades to both.
-- **Task** = unit of work in exactly one project (fixed at creation). `status` ∈ `todo|in_progress|done|cancelled` — exact values, no synonyms ("doing" is rejected). Forms two graphs: `--parent` (subtask tree, cascade-delete) and `block`/`--by` edges (dependency DAG, cycle-rejected). `blocked` = true while any blocker not done/cancelled — informational, blocked task still closeable.
+- **Task** = unit of work in exactly one project (fixed at creation). `status` ∈ `todo|in_progress|done|cancelled` — exact values, no synonyms ("doing" is rejected). Forms two graphs: `--parent` (subtask tree, cascade-delete) and `block`/`--by` edges (dependency DAG, cycle-rejected). `blocked` = true while any blocker not done/cancelled — informational, blocked task still closeable. `mesa task deps <id>` names the actual edges both ways (`blocked_by` / `blocks`); don't infer them.
 - **Storyboard** = freeform canvas in one project: frames (cards, optionally task-linked) + directed edges (cycles allowed). Visual, not a dependency graph.
 - **Inbox item** = free-text message in the one GLOBAL inbox (not tied to a project). Lands UNASSIGNED — agent uses it for whatever purpose. No auto-routing: a human routes it later with `inbox assign`, which CONVERTS it into a todo task in that project (and deletes the item); naming a project in the body does nothing.
 
@@ -27,7 +27,7 @@ Single binary `mesa`. Four command groups: `project`, `task`, `storyboard`, `inb
 | Working on | Commands | Read |
 |---|---|---|
 | Projects | create / list / show / update / delete | `reference/project.md` |
-| Tasks + dependency graph | create / list / next / show / update / delete / block / unblock / events / import / execute | `reference/task.md` |
+| Tasks + dependency graph | create / list / next / show / update / delete / block / unblock / deps / events / import / execute | `reference/task.md` |
 | Storyboards | create / list / show / update / delete / events / frame / edge | `reference/storyboard.md` |
 | Global inbox | add / list / show / assign / delete | `reference/inbox.md` |
 | Web UI / HTTP server | serve | `reference/serve.md` |

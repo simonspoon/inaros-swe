@@ -14,6 +14,7 @@ Unit of work in exactly one project (immutable after creation). Two graphs: subt
 | `mesa task delete <ID>` | Delete task AND all subtasks — no confirmation. |
 | `mesa task block <ID> --by <BY>` | `<ID>` becomes blocked by `<BY>`. |
 | `mesa task unblock <ID> --on <ON>` | Remove a blocked-by edge. |
+| `mesa task deps <ID>` | Both directions of `<ID>`'s edges — why it's blocked, what waits on it. |
 | `mesa task events [ID]` | Status-change log, oldest first. Omit ID for all tasks. |
 | `mesa task import` | Atomic graph import from JSON on stdin. |
 | `mesa task execute <ID>` | Fire the user-configured `task-execute` hook for the task (see below). |
@@ -61,12 +62,25 @@ Deterministic pick: among actionable tasks (optionally `--project`), order by pr
 
 Distinguishes all-done (all zero) vs work-in-flight (in_progress>0) vs stuck (blocked>0). Branch on `.next == null`, then on the counts.
 
-## block / unblock semantics
+## block / unblock / deps semantics
 
 - Blocking is **informational**: a blocked task can still be closed.
 - A task is blocked while any blocker is not done/cancelled.
 - Self-edges and cycles rejected → exit 1, code `cycle`. Re-adding an existing edge succeeds.
 - `unblock` on a non-existent edge → error, code `not_found`.
+
+`blocked: true` on its own doesn't say *what* is blocking. `deps` answers that —
+don't infer the graph from elsewhere:
+
+```bash
+mesa task deps 3
+{"id":3,"blocked":true,"blocked_by":[{...compact}],"blocks":[{...compact}]}
+```
+
+`blocked_by` = tasks 3 waits on; `blocks` = tasks waiting on 3. Both are **direct
+edges only** (not transitive) and compact objects (no `description`), same shape
+as `task list`. The culprits are the `blocked_by` entries whose `status` is
+neither `done` nor `cancelled`. Missing task → exit 1, `not_found`.
 
 ## import — atomic task graph
 
