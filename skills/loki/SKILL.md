@@ -5,7 +5,7 @@ description: Drive a native macOS desktop application with the loki CLI to live-
 
 # Loki — desktop QA via macOS accessibility
 
-Stateless CLI: no session id. Every command re-targets by window id (`<WID>`), `--pid`, `--window`, `--title`, or `--bundle-id`. Drives the macOS Accessibility API → macOS only. Written against loki 0.2.2 — behavior surprises → check `loki --version`, `loki <cmd> --help`.
+Stateless CLI: no session id. Every command re-targets by window id (`<WID>`), `--pid`, `--window`, `--title`, or `--bundle-id`. Drives the macOS Accessibility API → macOS only. Written against loki 0.3.0 — behavior surprises → check `loki --version`, `loki <cmd> --help`.
 
 **Preconditions:**
 - Accessibility permission granted. `loki check-permission` must print `granted`; else `loki request-permission` (opens system prompt), stop, tell user to grant it — cannot proceed without.
@@ -24,6 +24,7 @@ loki find $WID --role AXButton                          # discover elements; cap
 loki click-element $WID --id SaveButton                 #   activates app + clicks
 loki type "hello" --window $WID                         #   types into focused field of that window's app
 loki key "cmd+s" --window $WID                          #   key combo to that app
+loki menu "File>Save…" --window $WID                    #   open + press a menu-bar item by path
 # ... assert state reached:
 loki wait-for $WID --label "Saved" --timeout 5000
 loki screenshot --window $WID -o /tmp/loki-$WID-final.png   # then Read the PNG
@@ -59,6 +60,7 @@ Report each check PASS or FAIL with evidence, not "looks fine":
 - `find` text line: `AXButton "Save" id=SaveButton (WxH at X,Y) [path]`. `X,Y` = **screen** coordinates. `-f json` adds `value`, `enabled`, `focused`, `path`.
 - `click <X> <Y>` uses screen coords (from `find`'s `at X,Y`) — escape hatch for elements `click-element` can't resolve (custom-drawn canvas, unlabeled hit areas). `--double`, `--right` available. Prefer `click-element` — it activates the app and survives window moves.
 - `type` / `key` go to the **focused** element of the targeted app. Focus first (`click-element` activates + focuses). `key` combos: `cmd+s`, `cmd+shift+s`, `return`, `escape`, `tab`.
+- **Menu-bar items: use `loki menu "File>Open File…"`, not `click`/`find`.** The menu bar hangs off the *app* (`AXMenuBar`), not any window — so `find $WID` / `click-element` can't see it, and a coordinate `click` on an *open* NSMenu is swallowed by its modal event loop. `menu` walks the app's `AXMenuBar` and fires `AXPress` on the leaf, which works without opening menus visually. Path levels split on `>` (override with `--separator`); each level matches exact-first, then case-insensitively/substring, ignoring a trailing `…` (so `"Save As"` hits `"Save As…"`). Nested submenus just add levels: `"Format>Font>Bold"`. Targets the frontmost app unless `--pid`/`--bundle-id`/`--window` is given. Item not found → error lists the available titles at that level. This replaces the old keyboard-accelerator + screenshot fallback for menu items.
 - Text values carry macOS bidi/format marks (e.g. display `7+5` reads as `‎7‎+‎5`). Assert by substring or strip `‎‏‪-‮`, never raw `==`.
 - Default terse text output is what you read. `-f json | jq` only when scripting a field (the `$WID` capture). Default timeout 5000ms; `-t`/`--timeout` per command (`--timeout` for `wait-*`).
 - `loki tree $WID [--depth N] [--flat]` dumps the full element tree — use to discover roles/ids when `find` comes up empty.
